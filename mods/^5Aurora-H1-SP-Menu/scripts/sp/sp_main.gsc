@@ -1,0 +1,3 @@
+init() {
+    level preload::initial();
+}

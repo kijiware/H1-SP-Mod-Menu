@@ -1,0 +1,1326 @@
+#include source\utilities;
+#include source\structure;
+#include scripts\functions;
+#include scripts\testing;
+
+menu_option() {
+    menu = self get_menu();
+    switch( menu ) {
+        case "Main Menu":
+            self add_menu( ( "^:Aurora Single Player Menu v1.0" ) );
+            self add_toggle( "God Mode", "^:Immune To All Damage", ::god_mode, self.god_mode );
+            self add_toggle( "No Clip", "^:No Clip Mode", ::noclip_mode, self.noclip_mode );
+            self add_option( "Player Options", "^:Player Related Functions", ::new_menu, "Player Options" );
+            self add_option( "Game Options", "^:Game Related Functions", ::new_menu, "Game Options" );
+            self add_option( "Weapon Options", "^:Weapon Related Functions", ::new_menu, "Weapon Options" );
+            self add_option( "Entity Options", "^:Entity Related Functions", ::new_menu, "Entity Options" );
+            self add_option( "Miscellaneous Options", "^:Miscellaneous Functions", ::new_menu, "Miscellaneous Options" );
+            break;
+        case "Player Options":
+            self add_menu(menu);
+            self add_option( "Enable Player Control", "^:Enables Player Control", ::player_control, "" );
+            self add_toggle( "Slide", "^:Press ^1[{+stance}] ^:To Slide!", ::slide_toggle, self.slide_toggle );
+            self add_toggle( "UFO Mode 1", "^:Default UFO Mode", ::ufo_mode_default, self.ufo_mode_default );
+            self add_toggle( "UFO Mode 2", "^:Fly with [{+smoke}] | Land with [{+speed_throw}]", ::ufo_mode, self.ufo_mode );
+            self add_toggle( "Invisible Player", "^:Enemies Ignore Player", ::toggle_notarget, self.toggle_notarget );
+            self add_toggle( "Faster Move Speed", "^:Move Faster", ::fast_move, self.fast_move );
+            self add_toggle( "Super Jumps", "^:Jump Higher", ::high_jump, self.high_jump );
+            self add_toggle( "Low Gravity", "^:Lowers Gravity", ::low_grav, self.low_grav );
+			self add_toggle( "All Perks", "^:Gives/Removes All Perks", ::toggle_all_perks, self.toggle_all_perks );
+            self add_toggle( "Thermal Vision", "^:Thermal Vision", ::therm_vis, self.therm_vis );
+            self add_toggle( "Unlimited Jumps", "^:Jump Multiple Times", ::toggle_multi_jump, self.toggle_multi_jump );
+            self add_option( "Teleport: Spawn", "^:Teleports Player To Spawn", ::teleport_spawn, "" );
+            self add_option( "Print Position", "^:Prints Current Position", ::pos_print, "" );
+            break;
+        case "Game Options":
+            self add_menu(menu);
+            self add_increment( "Set Timescale", "^:Set Game Speed", ::set_timescale, 1, 0.05, 5, 0.05 );
+            self add_toggle( "Enable Friendly Fire", "^:Killing Allies Doesn't End Mission", ::disable_friendly_fire, self.disable_friendly_fire );
+            self add_toggle( "Disable Death Barriers", "^:Removes Kill Barriers", ::disable_death_barriers, self.disable_death_barriers );
+            self add_toggle( "Elite AI: Axis", "^:Upgrades Enemies To Elites", ::toggle_axis_elites, self.toggle_axis_elites );
+            self add_toggle( "Elite AI: Allies", "^:Upgrades Allies To Elites", ::toggle_allies_elites, self.toggle_allies_elites );
+            self add_toggle( "Accurate AI: Axis", "^:Enemies Are Very Accurate", ::toggle_axis_accuracy, self.toggle_axis_accuracy );
+            self add_toggle( "Accurate AI: Allies", "^:Allies Are Very Accurate", ::toggle_allies_accuracy, self.toggle_allies_accuracy );
+            self add_option( "Mission Select", "^:Select Mission To Start", ::new_menu, "Mission Select" );
+            self add_option( "Cheat Select", "^:Select Cheats", ::new_menu, "Cheat Select" );
+            self add_option( "Vision Options", "^:Select Vision Options", ::new_menu, "Vision Options" );
+            self add_option( "Disable Timer", "^:Kills Timer On Certain Missions", ::disable_timer, "" );
+            self add_option( "Disable Music", "^:Stops Currently Playing Music", ::stop_music, "" );
+            self add_option( "Make Script Vehicles Usable", "^:Sets All Script Vehicles To Usable", ::set_vehicles_usable, "" );
+            self add_option( "Next Mission", "^:Skips To Next Mission", ::new_menu, "Next Mission" );
+            self add_option( "Restart Mission: Selected Checkpoint", "^:Restarts Current Mission At Selected Checkpoint", ::new_menu, "Restart Mission" );
+            self add_option( "Restart Mission: ^1No Scripts", "^:Restarts Current Mission With ^1No Scripts", ::new_menu, "Restart Mission: No Game" );
+            self add_option( "Fail Mission", "^:Fails Current Mission", ::new_menu, "Fail Mission" );
+            break;
+        case "Miscellaneous Options":
+            self add_menu(menu);
+            self add_option( "Model Spawning", "^:Models Work With Forge", ::new_menu, "Model Spawning" );
+            self add_option( "Vehicle Spawning", "^:Spawn (Mostly) Drivable Vehicles", ::new_menu, "Vehicle Spawning" );
+            self add_toggle( "Forge Mode", "^:Press ^1[{+actionslot 1}] ^:For Controls", ::toggle_forge_mode, self.toggle_forge_mode );
+            self add_toggle( "Jetpack", "^:Hold [{+activate}] To Use The Jetpack", ::toggle_jetpack, self.toggle_jetpack );
+            self add_toggle( "Grappling Gun", "^:Moves Player To Bullet Location", ::toggle_grappling_gun, self.toggle_grappling_gun );
+            self add_toggle( "Blood Gun", "^:Guns Shoot Blood", ::toggle_blood_guns, self.toggle_blood_guns );
+            self add_toggle( "Instant Transmission", "^:Teleports Player To Bullet Location", ::toggle_teleport_gun, self.toggle_teleport_gun );
+            self add_toggle( "Teleporter", "^:Save Position With ^1[{+actionslot 3}]^:, Load With ^1[{+actionslot 4}]", ::toggle_teleporter, self.toggle_teleporter );
+            self add_toggle( "Disable Depth Of Field", "^:Useful For Blur On Certain Missions", ::toggle_dof, self.toggle_dof );
+            self add_toggle( "CQB Walk: Allies", "^:CQB Walk Animations For Allies", ::cqb_walk_allies_toggle, self.cqb_walk_allies_toggle );
+            self add_toggle( "CQB Walk: Axis", "^:CQB Walk Animations For Enemies", ::cqb_walk_axis_toggle, self.cqb_walk_axis_toggle );
+            self add_toggle( "Kill Aura: All", "^:Kills All Nearby AI", ::toggle_all_kill_aura, self.toggle_all_kill_aura, "" );
+            self add_toggle( "Kill Aura: Enemies", "^:Kills All Nearby Enemies", ::toggle_enemy_kill_aura, self.toggle_enemy_kill_aura, "axis" );
+            self add_option( "Teleport To Space", "^:Teleport To Space", ::move_to_space, "" );
+            self add_option( "Spawn Tornado", "^:Tosses Nearby Players and Entities Around" , ::tornado_start, "" );
+            self add_option( "Missile Salvo", "^:Launches Rockets At Enemies", ::rocket_barrage, "" );
+            self add_option( "Stop Music", "^:Stops Currently Playing Music", ::stop_music, "" );
+            self add_option( "Play Music: Airplane", "^:Plays Music: ^1airplane_alt_maximum_music", ::play_music, "airplane_alt_maximum_music" );
+            self add_option( "Play Music: Chaplin", "^:Plays Music: ^1cheat_chaplin_music", ::play_music, "cheat_chaplin_music" );
+            self add_option( "Constant Slide", "^:Start Constant Sliding", ::start_slide, "" );
+            break;
+        case "Vision Options":
+            self add_menu(menu);
+            self add_option( "Sun Color", "^:Select Sun Color", ::new_menu, "Sun Color" );
+            self add_option( "Set Vision", "^:Select A Vision", ::new_menu, "Set Vision" );
+            self add_toggle( "Fullbright Mode", "^:Fullbright Mode", ::fullbright_normal, self.fullbright_normal );
+            self add_toggle( "Fullbright Dev Mode", "^:Fullbright Mode From Dev CFG", ::fullbright_dev, self.fullbright_dev );
+            self add_toggle( "Pro Mod Mode", "^:Pro Mod Vision", ::pro_mod, self.pro_mod );
+            self add_toggle( "Shiny Mode", "^:Changes Specular Map To White", ::toggle_shiny_mode, self.toggle_shiny_mode );
+            self add_toggle( "Screenshot Mode", "^:Press ^1[{+actionslot 1}] ^:To Exit Screenshot Mode", ::screenshot_mode, self.screenshot_mode );
+            self add_toggle( "Disable View Model", "^:Disables Weapon And Arm Models", ::toggle_drawgun, self.toggle_drawgun );
+            self add_toggle( "Disable HUD", "^:Disables HUD", ::disable_hud, self.disable_hud );
+            self add_toggle( "Disable 2d", "^:Disables 2d Elements", ::disable_2d, self.disable_2d );
+            self add_toggle( "Disable FX", "^:Disables Effects", ::disable_fx, self.disable_fx );
+            break;
+        case "Weapon Options":
+            self add_menu( menu );
+            self add_option( "Select Weapons", "^:Give Weapons", ::new_menu, "Weapons" );
+			self add_option( "Select Equipment", "^:Give Equipment", ::new_menu, "Equipment" );
+			self add_option( "Select Lethal", "^:Give Lethal", ::new_menu, "Lethal" );
+            self add_option( "Select Projectiles", "^:Set Weapon Projectile", ::new_menu, "Projectiles" );
+			self add_toggle( "Infinite Ammo", "^:Unlimited Ammo", ::inf_ammo, self.inf_ammo );
+            self add_toggle( "Infinite Ammo Stock", "^:Unlimited Ammo Stock", ::toggle_unlimited_stock, self.toggle_unlimited_stock );
+            self add_toggle( "Infinite Grenades", "^:Unlimited Flash And Frag Grenades", ::toggle_unlimited_equipment, self.toggle_unlimited_equipment );
+            self add_toggle( "No Spread", "^:Disables Weapon Spread", ::toggle_no_spread, self.toggle_no_spread );
+            self add_toggle( "Rapid Fire", "^:Hold ^1[{+reload}] ^:While Firing", ::toggle_rapid_fire, self.toggle_rapid_fire );
+			self add_toggle( "Explosive Rounds", "^:Weapons Fire Explosive Rounds", ::toggle_explosive_rounds, self.toggle_explosive_rounds );
+            self add_toggle( "Laser", "^:Weapon Laser", ::laser_toggle, self.laser_toggle );
+            self add_option( "Give Ammo", "^:Give Current Weapon Ammo", ::give_ammo, "" );
+			self add_option( "Drop Current Weapon", "^:Drops Current Weapon (^1High Chance Of Crashing Game!^:)", ::drop_weapon, "" );
+            self add_option( "Remove Current Weapon", "^:Take Current Weapon", ::take_weapon, "" );
+			self add_option( "Remove All Weapons", "^:Take All Weapons", ::take_all_weapons, "" );
+            break;
+        case "Entity Options":
+            self add_menu( menu );
+            self add_option( "Disable AI Invulnerability", "^:Makes All AI Killable", ::set_vulnerable, "" );
+            self add_option( "Spawn Bot: Axis", "^:Spawns An Enemy Bot", ::spawn_bot, "axis" );
+            self add_option( "Spawn Bot: Allies", "^:Spawns An Allied Bot", ::spawn_bot, "allies" );
+            self add_toggle( "Ignore All: Axis", "^:Enemies Ignore All", ::toggle_axis_ignore, self.toggle_axis_ignore );
+            self add_toggle( "Ignore All: Allies", "^:Allies Ignore All", ::toggle_allies_ignore, self.toggle_allies_ignore );
+            self add_option( "Swap AI Teams", "^:Swaps Every AI's Team", ::set_team_swap, "" );
+            self add_option( "Player Team: Axis", "^:Changes Player Team To Axis", ::player_team, "axis" );
+            self add_option( "Player Team: Allies", "^:Changes Player Team To Allies", ::player_team, "allies" );
+            self add_option( "Team: Enemies To Allies", "^:Set Axis To Allies", ::set_team, "axis", "allies" );
+            self add_option( "Team: Allies To Enemies", "^:Set Allies To Axis", ::set_team, "allies", "axis" );
+            self add_option( "Team: All To Allies", "^:Set All To Allies", ::set_team_all, "allies" );
+            self add_option( "Team: All To Enemies", "^:Set All To Axis", ::set_team_all, "axis" );
+            self add_option( "Teleport: Enemies", "^:Teleports All Enemies", ::teleport_enemy_ai, "" );
+            self add_option( "Teleport: Allies", "^:Teleports All Allies", ::teleport_allied_ai, "" );
+            self add_option( "Teleport: AI", "^:Teleports All AI", ::teleport_all_ai, "" );
+            self add_option( "Teleport: Ents", "^:Teleports All Entities", ::teleport_all_ents, "" );
+            self add_option( "Kill: Enemies", "^:Kills All Enemies", ::kill_enemy_ai, "" );
+            self add_option( "Kill: Allies", "^:Kills All Allies", ::kill_allied_ai, "" );
+            self add_option( "Kill: AI", "^:Kills All AI", ::kill_all_ai, "" );
+            self add_option( "Delete: Enemies", "^:Deletes All Enemies", ::delete_enemy_ai, "" );
+            self add_option( "Delete: Allies", "^:Deletes All Allies", ::delete_allied_ai, "" );
+            self add_option( "Delete: AI", "^:Deletes All AI", ::delete_all_ai, "" );
+			self add_option( "Delete: Script Models", "^:Deletes All Script Models", ::delete_all_script_models, "" );
+            self add_option( "Delete: Script Brush Models", "^:Deletes All Script Brush Models", ::delete_all_script_brushmodels, "" );
+            self add_option( "Delete: Script Vehicles", "^:Deletes All Script Vehicles", ::delete_all_script_vehicles, "" );
+            self add_option( "Delete: Ents", "^:Deletes All Entities", ::delete_all_ents, "" );
+            break;
+        case "Cheat Select":
+            self add_menu( menu );
+            self add_option( "Tire Explosion Model", "^:Change Tire Explosion Model", ::new_menu, "Tire Model" );
+            self add_toggle( "Tire Explosion Cheat", "^:Enemies Explode Into Tires", ::tire_mode, self.tire_mode );
+            self add_toggle( "Cluster Grenades Cheat", "^:Frags Are Cluster Grenades", ::cluster_nades, self.cluster_nades );
+            self add_toggle( "Slowmo Cheat", "^:Melee For Slowmo", ::slowmo_mode, self.slowmo_mode );
+            self add_toggle( "Chaplin Cheat", "^:Chaplin/Ragtime Warfare", ::chaplin_mode, self.chaplin_mode );
+            self add_toggle( "Ragdoll Cheat", "^:Super Ragdolls", ::ragdoll_mode, self.ragdoll_mode );
+            self add_toggle( "Melon Head Cheat", "^:Enemies Have Melon Heads", ::melonhead_mode, self.melonhead_mode );
+            self add_toggle( "Tracksuit Cheat", "^:Enemies Wear Tracksuits", ::tracksuit_mode, self.tracksuit_mode );
+            self add_toggle( "Lemonade Cheat", "^:Lemonade Cheat", ::lemonade_mode, self.lemonade_mode );
+            break;
+        case "Tire Model":
+			self add_menu( menu );
+			self add_option( "Default Tire Explosion", "^:Changes Model To: ^com_junktire", ::override_random_tire, "com_junktire" );
+            self add_option( "Watermelon Explosion", "^:Changes Model To: ^1me_fruit_watermelon_oblong", ::override_random_tire, "me_fruit_watermelon_oblong" );
+            self add_option( "RPG Explosion", "^:Changes Model To: ^1projectile_rpg7", ::override_random_tire, "projectile_rpg7" );
+            self add_option( "M4 Clip Explosion", "^:Changes Model To: ^1weapon_m4_clip", ::override_random_tire, "weapon_m4_clip" );
+            self add_option( "Helmet Explosion 1", "^:Changes Model To: ^1helmet_sp_arab_regular_suren_nostrap", ::override_random_tire, "helmet_sp_arab_regular_suren_nostrap" );
+            self add_option( "Helmet Explosion 2", "^:Changes Model To: ^1helmet_sp_arab_regular_tariq_nostrap", ::override_random_tire, "helmet_sp_arab_regular_tariq_nostrap" );
+			break;
+        case "Equipment":
+			self add_menu( menu );
+			self add_option( "Flash Grenade", "^:Set Equipment to Flash Grenade", ::give_equipment, "flash_grenade" );
+			self add_option( "Frag Grenade", "^:Set Equipment to Frag Grenade", ::give_equipment, "fraggrenade" );
+			break;
+		case "Lethal":
+            self add_menu( menu );
+			self add_option( "Flash Grenade", "^:Set Equipment to Flash Grenade", ::give_lethal, "flash_grenade" );
+			self add_option( "Frag Grenade", "^:Set Equipment to Frag Grenade", ::give_lethal, "fraggrenade" );
+			break;
+        case "Set Vision":
+            self add_menu( menu );
+            self add_option( "Visions", "^:Select Visions", ::new_menu, "Visions" );
+			self add_option( "MP Map Visions", "^:Select Visions From MP Maps", ::new_menu, "MP Map Visions" );
+            break;
+        case "Sun Color":
+			self add_menu( menu );
+			self add_toggle( "Disco Sun", "^:Rapidly Changing Sun Color", ::toggle_disco_sun, self.toggle_disco_sun );
+			self add_option( "Default", "^:Default Sun/Fog Color" , ::set_sun_color, "1.1 1.05 0.85", "^7Default" );
+			self add_option( "Red", "^:Red Sun/Fog Color" , ::set_sun_color, "2 0 0", "^1Red" );
+			self add_option( "Green", "^:Green Sun/Fog Color" , ::set_sun_color, "0 2 0", "^2Green" );
+			self add_option( "Blue", "^:Blue Sun/Fog Color" , ::set_sun_color, "0 0 2", "^4Blue" );
+			self add_option( "Yellow", "^:Yellow Sun/Fog Color" , ::set_sun_color, "2 2 0", "^3Yellow" );
+			self add_option( "Cyan", "^:Cyan Sun/Fog Color" , ::set_sun_color, "0 2 2", "^5Cyan" );
+			self add_option( "Pink", "^:Pink Sun/Fog Color" , ::set_sun_color, "2 1 2", "^6Pink" );
+			self add_option( "White", "^:White Sun/Fog Color" , ::set_sun_color, "2 2 2", "^7White" );
+			self add_option( "Black", "^:Black Sun/Fog Color" , ::set_sun_color, "0 0 0", "^0Black" );
+			break;
+        case "Next Mission":
+            self add_menu( menu );
+            self add_option( "Confirm Next Mission", "^:Confirm Skip To Next Mission", ::skip_mission, "" );
+            break;
+        case "Fail Mission":
+            self add_menu( menu );
+            self add_option( "Confirm Fail Mission", "^:Confirm Fail Current Mission", ::fail_mission, "" );
+            break;
+        case "Restart Mission: No Game":
+            self add_menu( menu );
+            self add_option( "Confirm Restart ^1No Scripts", "^:Disable With Console Command: ^1start default; fast_restart", ::restart_no_game, "" );
+            break;
+        case "Mission Select":
+            self add_menu(menu);
+            self add_option( "FNG", "^:Change Mission To: ^1FNG", ::change_mission, "killhouse" );
+            self add_option( "Crew Expendable", "^:Change Mission To: ^1Crew Expendable", ::change_mission, "cargoship" );
+            self add_option( "The Coup", "^:Change Mission To: ^1The Coup", ::change_mission, "coup" );
+            self add_option( "Blackout", "^:Change Mission To: ^1Blackout", ::change_mission, "blackout" );
+            self add_option( "Charlie Dont Surf", "^:Change Mission To: ^1Charlie Dont Surf", ::change_mission, "armada" );
+            self add_option( "The Bog", "^:Change Mission To: ^1The Bog", ::change_mission, "bog_a" );
+            self add_option( "Hunted", "^:Change Mission To: ^1Hunted", ::change_mission, "hunted" );
+            self add_option( "Death From Above", "^:Change Mission To: ^1Death From Above", ::change_mission, "ac130" );
+            self add_option( "War Pig", "^:Change Mission To: ^1War Pig", ::change_mission, "bog_b" );
+            self add_option( "Shock And Awe", "^:Change Mission To: ^1Shock And Awe", ::change_mission, "airlift" );
+            self add_option( "Aftermath", "^:Change Mission To: ^1Aftermath", ::change_mission, "aftermath" );
+            self add_option( "Safehouse", "^:Change Mission To: ^1Safehouse", ::change_mission, "village_assault" );
+            self add_option( "All Ghillied Up", "^:Change Mission To: ^1All Ghillied Up", ::change_mission, "scoutsniper" );
+            self add_option( "One Shot One Kill", "^:Change Mission To: ^1One Shot One Kill", ::change_mission, "sniperescape" );
+            self add_option( "Heat", "^:Change Mission To: ^1Heat", ::change_mission, "village_defend" );
+            self add_option( "The Sins Of The Father", "^:Change Mission To: ^1The Sins Of The Father", ::change_mission, "ambush" );
+            self add_option( "Ultimatum", "^:Change Mission To: ^1Ultimatum", ::change_mission, "icbm" );
+            self add_option( "All In", "^:Change Mission To: ^1All In", ::change_mission, "launchfacility_a" );
+            self add_option( "No Fighting In The War Room", "^:Change Mission To: ^1No Fighting In The War Room", ::change_mission, "launchfacility_b" );
+            self add_option( "Game Over", "^:Change Mission To: ^1Game Over", ::change_mission, "jeepride" );
+            self add_option( "Mile High Club", "^:Change Mission To: ^1Mile High Club", ::change_mission, "airplane" );
+            break;
+        case "Restart Mission":
+            self add_menu( menu );
+            self add_option( "Restart Mission: Default", "^:Confirm Restart Current Mission", ::restart_mission, "" );
+            if( getDvar( "mapname" ) == "killhouse" ) {
+                self add_option( "Restart Mission: inside", "^:Restart Current Mission At: inside", ::restart_mission_starts, "inside" );
+                self add_option( "Restart Mission: shoot", "^:Restart Current Mission At: shoot", ::restart_mission_starts, "shoot" );
+                self add_option( "Restart Mission: timed", "^:Restart Current Mission At: timed", ::restart_mission_starts, "timed" );
+                self add_option( "Restart Mission: sidearm", "^:Restart Current Mission At: sidearm", ::restart_mission_starts, "sidearm" );
+                self add_option( "Restart Mission: frag", "^:Restart Current Mission At: frag", ::restart_mission_starts, "frag" );
+                self add_option( "Restart Mission: launcher", "^:Restart Current Mission At: launcher", ::restart_mission_starts, "launcher" );
+                self add_option( "Restart Mission: explosives", "^:Restart Current Mission At: explosives", ::restart_mission_starts, "explosives" );
+                self add_option( "Restart Mission: course", "^:Restart Current Mission At: course", ::restart_mission_starts, "course" );
+                self add_option( "Restart Mission: ship", "^:Restart Current Mission At: ship", ::restart_mission_starts, "ship" );
+                self add_option( "Restart Mission: mp5", "^:Restart Current Mission At: mp5", ::restart_mission_starts, "mp5" );
+                self add_option( "Restart Mission: debrief", "^:Restart Current Mission At: debrief", ::restart_mission_starts, "debrief" );
+            }
+            if( getDvar( "mapname" ) == "cargoship" ) {
+                self add_option( "Restart Mission: bridge", "^:Restart Current Mission At: bridge", ::restart_mission_starts, "bridge" );
+                self add_option( "Restart Mission: deck", "^:Restart Current Mission At: deck", ::restart_mission_starts, "deck" );
+                self add_option( "Restart Mission: hallways", "^:Restart Current Mission At: hallways", ::restart_mission_starts, "hallways" );
+                self add_option( "Restart Mission: cargohold", "^:Restart Current Mission At: cargohold", ::restart_mission_starts, "cargohold" );
+                self add_option( "Restart Mission: cargohold2", "^:Restart Current Mission At: cargohold2", ::restart_mission_starts, "cargohold2" );
+                self add_option( "Restart Mission: laststand", "^:Restart Current Mission At: laststand", ::restart_mission_starts, "laststand" );
+                self add_option( "Restart Mission: package", "^:Restart Current Mission At: package", ::restart_mission_starts, "package" );
+                self add_option( "Restart Mission: escape", "^:Restart Current Mission At: escape", ::restart_mission_starts, "escape" );
+                self add_option( "Restart Mission: end", "^:Restart Current Mission At: end", ::restart_mission_starts, "end" );
+            }
+            if( getDvar( "mapname" ) == "coup" ) {
+                self add_option( "Restart Mission: drive", "^:Restart Current Mission At: drive", ::restart_mission_starts, "drive" );
+                self add_option( "Restart Mission: doorkick", "^:Restart Current Mission At: doorkick", ::restart_mission_starts, "doorkick" );
+                self add_option( "Restart Mission: trashstumble", "^:Restart Current Mission At: trashstumble", ::restart_mission_starts, "trashstumble" );
+                self add_option( "Restart Mission: runners2", "^:Restart Current Mission At: runners2", ::restart_mission_starts, "runners2" );
+                self add_option( "Restart Mission: alley", "^:Restart Current Mission At: alley", ::restart_mission_starts, "alley" );
+                self add_option( "Restart Mission: shore", "^:Restart Current Mission At: shore", ::restart_mission_starts, "shore" );
+                self add_option( "Restart Mission: carexit", "^:Restart Current Mission At: carexit", ::restart_mission_starts, "carexit" );
+                self add_option( "Restart Mission: ending", "^:Restart Current Mission At: ending", ::restart_mission_starts, "ending" );
+            }
+            if( getDvar( "mapname" ) == "blackout" ) {
+                self add_option( "Restart Mission: chess", "^:Restart Current Mission At: chess", ::restart_mission_starts, "chess" );
+                self add_option( "Restart Mission: field", "^:Restart Current Mission At: field", ::restart_mission_starts, "field" );
+                self add_option( "Restart Mission: overlook", "^:Restart Current Mission At: overlook", ::restart_mission_starts, "overlook" );
+                self add_option( "Restart Mission: cliff", "^:Restart Current Mission At: cliff", ::restart_mission_starts, "cliff" );
+                self add_option( "Restart Mission: rappel", "^:Restart Current Mission At: rappel", ::restart_mission_starts, "rappel" );
+                self add_option( "Restart Mission: farmhouse", "^:Restart Current Mission At: farmhouse", ::restart_mission_starts, "farmhouse" );
+                self add_option( "Restart Mission: blackout", "^:Restart Current Mission At: blackout", ::restart_mission_starts, "blackout" );
+                self add_option( "Restart Mission: rescue", "^:Restart Current Mission At: rescue", ::restart_mission_starts, "rescue" );
+            }
+            if( getDvar( "mapname" ) == "armada" ) {
+                self add_option( "Restart Mission: ride", "^:Restart Current Mission At: ride", ::restart_mission_starts, "ride" );
+                self add_option( "Restart Mission: landed", "^:Restart Current Mission At: landed", ::restart_mission_starts, "landed" );
+                self add_option( "Restart Mission: hq2tv", "^:Restart Current Mission At: hq2tv", ::restart_mission_starts, "hq2tv" );
+                self add_option( "Restart Mission: intel", "^:Restart Current Mission At: intel", ::restart_mission_starts, "intel" );
+                self add_option( "Restart Mission: tv", "^:Restart Current Mission At: tv", ::restart_mission_starts, "tv" );
+                self add_option( "Restart Mission: tank", "^:Restart Current Mission At: tank", ::restart_mission_starts, "tank" );
+                self add_option( "Restart Mission: end", "^:Restart Current Mission At: end", ::restart_mission_starts, "end" );
+            }
+            if( getDvar( "mapname" ) == "bog_a" ) {
+                self add_option( "Restart Mission: melee", "^:Restart Current Mission At: melee", ::restart_mission_starts, "melee" );
+                self add_option( "Restart Mission: breach", "^:Restart Current Mission At: breach", ::restart_mission_starts, "breach" );
+                self add_option( "Restart Mission: alley", "^:Restart Current Mission At: alley", ::restart_mission_starts, "alley" );
+                self add_option( "Restart Mission: shanty", "^:Restart Current Mission At: shanty", ::restart_mission_starts, "shanty" );
+                self add_option( "Restart Mission: bog", "^:Restart Current Mission At: bog", ::restart_mission_starts, "bog" );
+                self add_option( "Restart Mission: zpu", "^:Restart Current Mission At: zpu", ::restart_mission_starts, "zpu" );
+                self add_option( "Restart Mission: cobras", "^:Restart Current Mission At: cobras", ::restart_mission_starts, "cobras" );
+                self add_option( "Restart Mission: end", "^:Restart Current Mission At: end", ::restart_mission_starts, "end" );
+            }
+            if( getDvar( "mapname" ) == "hunted" ) {
+                self add_option( "Restart Mission: crash", "^:Restart Current Mission At: crash", ::restart_mission_starts, "crash" );
+                self add_option( "Restart Mission: path", "^:Restart Current Mission At: path", ::restart_mission_starts, "path" );
+                self add_option( "Restart Mission: barn", "^:Restart Current Mission At: barn", ::restart_mission_starts, "barn" );
+                self add_option( "Restart Mission: field", "^:Restart Current Mission At: field", ::restart_mission_starts, "field" );
+                self add_option( "Restart Mission: basement", "^:Restart Current Mission At: basement", ::restart_mission_starts, "basement" );
+                self add_option( "Restart Mission: dogs", "^:Restart Current Mission At: dogs", ::restart_mission_starts, "dogs" );
+                self add_option( "Restart Mission: farm", "^:Restart Current Mission At: farm", ::restart_mission_starts, "farm" );
+                self add_option( "Restart Mission: creek", "^:Restart Current Mission At: creek", ::restart_mission_starts, "creek" );
+                self add_option( "Restart Mission: greenhouse", "^:Restart Current Mission At: greenhouse", ::restart_mission_starts, "greenhouse" );
+                self add_option( "Restart Mission: ac130", "^:Restart Current Mission At: ac130", ::restart_mission_starts, "ac130" );
+            }
+            if( getDvar( "mapname" ) == "ac130" ) {
+                self add_option( "Restart Mission: church", "^:Restart Current Mission At: church", ::restart_mission_starts, "church" );
+                self add_option( "Restart Mission: field", "^:Restart Current Mission At: field", ::restart_mission_starts, "field" );
+                self add_option( "Restart Mission: hijack", "^:Restart Current Mission At: hijack", ::restart_mission_starts, "hijack" );
+                self add_option( "Restart Mission: junkyard", "^:Restart Current Mission At: junkyard", ::restart_mission_starts, "junkyard" );
+            }
+            if( getDvar( "mapname" ) == "bog_b" ) {
+                self add_option( "Restart Mission: arch", "^:Restart Current Mission At: arch", ::restart_mission_starts, "arch" );
+                self add_option( "Restart Mission: alley", "^:Restart Current Mission At: alley", ::restart_mission_starts, "alley" );
+                self add_option( "Restart Mission: ch46", "^:Restart Current Mission At: ch46", ::restart_mission_starts, "ch46" );
+            }
+            if( getDvar( "mapname" ) == "airlift" ) {
+                self add_option( "Restart Mission: debug", "^:Restart Current Mission At: debug", ::restart_mission_starts, "debug" );
+                self add_option( "Restart Mission: smoketown", "^:Restart Current Mission At: smoketown", ::restart_mission_starts, "smoketown" );
+                self add_option( "Restart Mission: cobraflight", "^:Restart Current Mission At: cobraflight", ::restart_mission_starts, "cobraflight" );
+                self add_option( "Restart Mission: cobrastreets", "^:Restart Current Mission At: cobrastreets", ::restart_mission_starts, "cobrastreets" );
+                self add_option( "Restart Mission: nuke", "^:Restart Current Mission At: nuke", ::restart_mission_starts, "nuke" );
+            }
+            if( getDvar( "mapname" ) == "village_assault" ) {
+                self add_option( "Restart Mission: town", "^:Restart Current Mission At: town", ::restart_mission_starts, "town" );
+                self add_option( "Restart Mission: alasad_barn", "^:Restart Current Mission At: alasad_barn", ::restart_mission_starts, "alasad_barn" );
+                self add_option( "Restart Mission: alasad_house", "^:Restart Current Mission At: alasad_house", ::restart_mission_starts, "alasad_house" );
+            }
+            if( getDvar( "mapname" ) == "scoutsniper" ) {
+                self add_option( "Restart Mission: church", "^:Restart Current Mission At: church", ::restart_mission_starts, "church" );
+                self add_option( "Restart Mission: church_x", "^:Restart Current Mission At: church_x", ::restart_mission_starts, "church_x" );
+                self add_option( "Restart Mission: graveyard", "^:Restart Current Mission At: graveyard", ::restart_mission_starts, "graveyard" );
+                self add_option( "Restart Mission: graveyard_x", "^:Restart Current Mission At: graveyard_x", ::restart_mission_starts, "graveyard_x" );
+                self add_option( "Restart Mission: field", "^:Restart Current Mission At: field", ::restart_mission_starts, "field" );
+                self add_option( "Restart Mission: pond", "^:Restart Current Mission At: pond", ::restart_mission_starts, "pond" );
+                self add_option( "Restart Mission: cargo", "^:Restart Current Mission At: cargo", ::restart_mission_starts, "cargo" );
+                self add_option( "Restart Mission: dash", "^:Restart Current Mission At: dash", ::restart_mission_starts, "dash" );
+                self add_option( "Restart Mission: town", "^:Restart Current Mission At: town", ::restart_mission_starts, "town" );
+                self add_option( "Restart Mission: dogs", "^:Restart Current Mission At: dogs", ::restart_mission_starts, "dogs" );
+                self add_option( "Restart Mission: center", "^:Restart Current Mission At: center", ::restart_mission_starts, "center" );
+                self add_option( "Restart Mission: end", "^:Restart Current Mission At: end", ::restart_mission_starts, "end" );
+            }
+            if( getDvar( "mapname" ) == "sniperescape" ) {
+                self add_option( "Restart Mission: rappel", "^:Restart Current Mission At: rappel", ::restart_mission_starts, "rappel" );
+                self add_option( "Restart Mission: run", "^:Restart Current Mission At: run", ::restart_mission_starts, "run" );
+                self add_option( "Restart Mission: apart", "^:Restart Current Mission At: apart", ::restart_mission_starts, "apart" );
+                self add_option( "Restart Mission: wounding", "^:Restart Current Mission At: wounding", ::restart_mission_starts, "wounding" );
+                self add_option( "Restart Mission: crash", "^:Restart Current Mission At: crash", ::restart_mission_starts, "crash" );
+                self add_option( "Restart Mission: wounded", "^:Restart Current Mission At: wounded", ::restart_mission_starts, "wounded" );
+                self add_option( "Restart Mission: burnt", "^:Restart Current Mission At: burnt", ::restart_mission_starts, "burnt" );
+                self add_option( "Restart Mission: pool", "^:Restart Current Mission At: pool", ::restart_mission_starts, "pool" );
+                self add_option( "Restart Mission: fair", "^:Restart Current Mission At: fair", ::restart_mission_starts, "fair" );
+                self add_option( "Restart Mission: fair_battle", "^:Restart Current Mission At: fair_battle", ::restart_mission_starts, "fair_battle" );
+                self add_option( "Restart Mission: fair_battle2", "^:Restart Current Mission At: fair_battle2", ::restart_mission_starts, "fair_battle2" );
+                self add_option( "Restart Mission: seaknight", "^:Restart Current Mission At: seaknight", ::restart_mission_starts, "seaknight" );
+            }
+            if( getDvar( "mapname" ) == "village_defend" ) {
+                self add_option( "Restart Mission: southern_hill", "^:Restart Current Mission At: southern_hill", ::restart_mission_starts, "southern_hill" );
+                self add_option( "Restart Mission: minigun_fallback", "^:Restart Current Mission At: minigun_fallback", ::restart_mission_starts, "minigun_fallback" );
+                self add_option( "Restart Mission: minigun", "^:Restart Current Mission At: minigun", ::restart_mission_starts, "minigun" );
+                self add_option( "Restart Mission: helidrop", "^:Restart Current Mission At: helidrop", ::restart_mission_starts, "helidrop" );
+                self add_option( "Restart Mission: clackers", "^:Restart Current Mission At: clackers", ::restart_mission_starts, "clackers" );
+                self add_option( "Restart Mission: field_fallback", "^:Restart Current Mission At: field_fallback", ::restart_mission_starts, "field_fallback" );
+                self add_option( "Restart Mission: javelin", "^:Restart Current Mission At: javelin", ::restart_mission_starts, "javelin" );
+                self add_option( "Restart Mission: final_battle", "^:Restart Current Mission At: final_battle", ::restart_mission_starts, "final_battle" );
+                self add_option( "Restart Mission: seaknight", "^:Restart Current Mission At: seaknight", ::restart_mission_starts, "seaknight" );
+            }
+            if( getDvar( "mapname" ) == "ambush" ) {
+                self add_option( "Restart Mission: ambush", "^:Restart Current Mission At: ambush", ::restart_mission_starts, "ambush" );
+                self add_option( "Restart Mission: village", "^:Restart Current Mission At: village", ::restart_mission_starts, "village" );
+                self add_option( "Restart Mission: morpheus", "^:Restart Current Mission At: morpheus", ::restart_mission_starts, "morpheus" );
+                self add_option( "Restart Mission: apartment", "^:Restart Current Mission At: apartment", ::restart_mission_starts, "apartment" );
+                self add_option( "Restart Mission: suicide", "^:Restart Current Mission At: suicide", ::restart_mission_starts, "suicide" );
+            }
+            if( getDvar( "mapname" ) == "icbm" ) {
+                self add_option( "Restart Mission: landed", "^:Restart Current Mission At: landed", ::restart_mission_starts, "landed" );
+                self add_option( "Restart Mission: basement", "^:Restart Current Mission At: basement", ::restart_mission_starts, "basement" );
+                self add_option( "Restart Mission: house2", "^:Restart Current Mission At: house2", ::restart_mission_starts, "house2" );
+                self add_option( "Restart Mission: rescued", "^:Restart Current Mission At: rescued", ::restart_mission_starts, "rescued" );
+                self add_option( "Restart Mission: tower", "^:Restart Current Mission At: tower", ::restart_mission_starts, "tower" );
+                self add_option( "Restart Mission: fense", "^:Restart Current Mission At: fense", ::restart_mission_starts, "fense" );
+                self add_option( "Restart Mission: base", "^:Restart Current Mission At: base", ::restart_mission_starts, "base" );
+                self add_option( "Restart Mission: base2", "^:Restart Current Mission At: base2", ::restart_mission_starts, "base2" );
+                self add_option( "Restart Mission: launch", "^:Restart Current Mission At: launch", ::restart_mission_starts, "launch" );
+            }
+            if( getDvar( "mapname" ) == "launchfacility_a" ) {
+                self add_option( "Restart Mission: container", "^:Restart Current Mission At: container", ::restart_mission_starts, "container" );
+                self add_option( "Restart Mission: tarmac", "^:Restart Current Mission At: tarmac", ::restart_mission_starts, "tarmac" );
+                self add_option( "Restart Mission: gate", "^:Restart Current Mission At: gate", ::restart_mission_starts, "gate" );
+                self add_option( "Restart Mission: vents", "^:Restart Current Mission At: vents", ::restart_mission_starts, "vents" );
+            }
+            if( getDvar( "mapname" ) == "launchfacility_b" ) {
+                self add_option( "Restart Mission: warehouse", "^:Restart Current Mission At: warehouse", ::restart_mission_starts, "warehouse" );
+                self add_option( "Restart Mission: launchtubes", "^:Restart Current Mission At: launchtubes", ::restart_mission_starts, "launchtubes" );
+                self add_option( "Restart Mission: vaultdoors", "^:Restart Current Mission At: vaultdoors", ::restart_mission_starts, "vaultdoors" );
+                self add_option( "Restart Mission: controlroom", "^:Restart Current Mission At: controlroom", ::restart_mission_starts, "controlroom" );
+                self add_option( "Restart Mission: escape", "^:Restart Current Mission At: escape", ::restart_mission_starts, "escape" );
+                self add_option( "Restart Mission: elevator", "^:Restart Current Mission At: elevator", ::restart_mission_starts, "elevator" );
+            }
+            if( getDvar( "mapname" ) == "jeepride" ) {
+                self add_option( "Restart Mission: start", "^:Restart Current Mission At: start", ::restart_mission_starts, "start" );
+                self add_option( "Restart Mission: first_hind", "^:Restart Current Mission At: first_hind", ::restart_mission_starts, "first_hind" );
+                self add_option( "Restart Mission: against_traffic", "^:Restart Current Mission At: against_traffic", ::restart_mission_starts, "against_traffic" );
+                self add_option( "Restart Mission: final_stretch", "^:Restart Current Mission At: final_stretch", ::restart_mission_starts, "final_stretch" );
+                self add_option( "Restart Mission: bridge_explode", "^:Restart Current Mission At: bridge_explode", ::restart_mission_starts, "bridge_explode" );
+                self add_option( "Restart Mission: bridge_combat", "^:Restart Current Mission At: bridge_combat", ::restart_mission_starts, "bridge_combat" );
+                self add_option( "Restart Mission: bridge_zak", "^:Restart Current Mission At: bridge_zak", ::restart_mission_starts, "bridge_zak" );
+                self add_option( "Restart Mission: bridge_rescue", "^:Restart Current Mission At: bridge_rescue", ::restart_mission_starts, "bridge_rescue" );
+                self add_option( "Restart Mission: nowhere", "^:Restart Current Mission At: nowhere", ::restart_mission_starts, "nowhere" );
+            }
+            if( getDvar( "mapname" ) == "airplane" ) {
+                self add_option( "Restart Mission: breach", "^:Restart Current Mission At: breach", ::restart_mission_starts, "breach" );
+                self add_option( "Restart Mission: vip", "^:Restart Current Mission At: vip", ::restart_mission_starts, "vip" );
+                self add_option( "Restart Mission: freefall", "^:Restart Current Mission At: freefall", ::restart_mission_starts, "freefall" );
+                self add_option( "Restart Mission: demo", "^:Restart Current Mission At: demo", ::restart_mission_starts, "demo" );
+            }
+            break;
+        case "MP Map Visions":
+            self add_menu( menu );
+			self add_option( "Set Vision: ^1mp_Backlot", "Sets Vision To: ^1mp_Backlot", ::set_vision, "mp_backlot" );
+            self add_option( "Set Vision: ^1mp_Bloc", "Sets Vision To: ^1mp_Bloc", ::set_vision, "mp_bloc" );
+            self add_option( "Set Vision: ^1mp_Bog", "Sets Vision To: ^1mp_Bog", ::set_vision, "mp_bog" );
+            self add_option( "Set Vision: ^1mp_Brecourt", "Sets Vision To: ^1mp_Brecourt", ::set_vision, "mp_brecourt" );
+            self add_option( "Set Vision: ^1mp_Broadcast", "Sets Vision To: ^1mp_Broadcast", ::set_vision, "mp_broadcast" );
+            self add_option( "Set Vision: ^1mp_Carentan", "Sets Vision To: ^1mp_Carentan", ::set_vision, "mp_carentan" );
+            self add_option( "Set Vision: ^1mp_Cargoship", "Sets Vision To: ^1mp_Cargoship", ::set_vision, "mp_cargoship" );
+            self add_option( "Set Vision: ^1mp_Citystreets", "Sets Vision To: ^1mp_Citystreets", ::set_vision, "mp_citystreets" );
+            self add_option( "Set Vision: ^1mp_Convoy", "Sets Vision To: ^1mp_Convoy", ::set_vision, "mp_convoy" );
+            self add_option( "Set Vision: ^1mp_Countdown", "Sets Vision To: ^1mp_Countdown", ::set_vision, "mp_countdown" );
+            self add_option( "Set Vision: ^1mp_Crash", "Sets Vision To: ^1mp_Crash", ::set_vision, "mp_crash" );
+            self add_option( "Set Vision: ^1mp_Crash_Damage", "Sets Vision To: ^1mp_Crash_Damage", ::set_vision, "mp_crash_damage" );
+            self add_option( "Set Vision: ^1mp_Creek", "Sets Vision To: ^1mp_Creek", ::set_vision, "mp_creek" );
+            self add_option( "Set Vision: ^1mp_Creek_Ss", "Sets Vision To: ^1mp_Creek_Ss", ::set_vision, "mp_creek_ss" );
+            self add_option( "Set Vision: ^1mp_Crossfire", "Sets Vision To: ^1mp_Crossfire", ::set_vision, "mp_crossfire" );
+            self add_option( "Set Vision: ^1mp_Derail", "Sets Vision To: ^1mp_Derail", ::set_vision, "mp_derail" );
+            self add_option( "Set Vision: ^1mp_Dusk", "Sets Vision To: ^1mp_Dusk", ::set_vision, "mp_dusk" );
+            self add_option( "Set Vision: ^1mp_Farm", "Sets Vision To: ^1mp_Farm", ::set_vision, "mp_farm" );
+            self add_option( "Set Vision: ^1mp_Favela", "Sets Vision To: ^1mp_Favela", ::set_vision, "mp_favela" );
+            self add_option( "Set Vision: ^1mp_Firingrange", "Sets Vision To: ^1mp_Firingrange", ::set_vision, "mp_firingrange" );
+            self add_option( "Set Vision: ^1mp_Highrise", "Sets Vision To: ^1mp_Highrise", ::set_vision, "mp_highrise" );
+            self add_option( "Set Vision: ^1mp_Hill", "Sets Vision To: ^1mp_Hill", ::set_vision, "mp_hill" );
+            self add_option( "Set Vision: ^1mp_Killhouse", "Sets Vision To: ^1mp_Killhouse", ::set_vision, "mp_killhouse" );
+            self add_option( "Set Vision: ^1mp_Nightshift", "Sets Vision To: ^1mp_Nightshift", ::set_vision, "mp_nightshift" );
+            self add_option( "Set Vision: ^1mp_Oilrig", "Sets Vision To: ^1mp_Oilrig", ::set_vision, "mp_oilrig" );
+            self add_option( "Set Vision: ^1mp_Overgrown", "Sets Vision To: ^1mp_Overgrown", ::set_vision, "mp_overgrown" );
+            self add_option( "Set Vision: ^1mp_Pipeline", "Sets Vision To: ^1mp_Pipeline", ::set_vision, "mp_pipeline" );
+            self add_option( "Set Vision: ^1mp_Quarry", "Sets Vision To: ^1mp_Quarry", ::set_vision, "mp_quarry" );
+            self add_option( "Set Vision: ^1mp_Riverwalk", "Sets Vision To: ^1mp_Riverwalk", ::set_vision, "mp_riverwalk" );
+            self add_option( "Set Vision: ^1mp_Shipment", "Sets Vision To: ^1mp_Shipment", ::set_vision, "mp_shipment" );
+            self add_option( "Set Vision: ^1mp_Showdown", "Sets Vision To: ^1mp_Showdown", ::set_vision, "mp_showdown" );
+            self add_option( "Set Vision: ^1mp_Skidrow", "Sets Vision To: ^1mp_Skidrow", ::set_vision, "mp_skidrow" );
+            self add_option( "Set Vision: ^1mp_Strike", "Sets Vision To: ^1mp_Strike", ::set_vision, "mp_strike" );
+            self add_option( "Set Vision: ^1mp_Suburbia", "Sets Vision To: ^1mp_Suburbia", ::set_vision, "mp_suburbia" );
+            self add_option( "Set Vision: ^1mp_Trailer", "Sets Vision To: ^1mp_Trailer", ::set_vision, "mp_trailer" );
+            self add_option( "Set Vision: ^1mp_Vacant", "Sets Vision To: ^1mp_Vacant", ::set_vision, "mp_vacant" );
+            self add_option( "Set Vision: ^1mp_Verdict", "Sets Vision To: ^1mp_Verdict", ::set_vision, "mp_verdict" );
+			break;
+        case "Visions":
+            self add_menu( menu );
+			self add_option( "Set Vision: ^1Ac130", "Sets Vision To: ^1Ac130", ::set_vision, "ac130" );
+            self add_option( "Set Vision: ^1Ac130_Inverted", "Sets Vision To: ^1Ac130_Inverted", ::set_vision, "ac130_inverted" );
+            self add_option( "Set Vision: ^1Af_Caves_Indoors", "Sets Vision To: ^1Af_Caves_Indoors", ::set_vision, "af_caves_indoors" );
+            self add_option( "Set Vision: ^1Af_Caves_Outdoors", "Sets Vision To: ^1Af_Caves_Outdoors", ::set_vision, "af_caves_outdoors" );
+            self add_option( "Set Vision: ^1Af_Caves_Outdoors_Airstrip", "Sets Vision To: ^1Af_Caves_Outdoors_Airstrip", ::set_vision, "af_caves_outdoors_airstrip" );
+            self add_option( "Set Vision: ^1Airport", "Sets Vision To: ^1Airport", ::set_vision, "airport" );
+            self add_option( "Set Vision: ^1Airport_Death", "Sets Vision To: ^1Airport_Death", ::set_vision, "airport_death" );
+            self add_option( "Set Vision: ^1Airport_Exterior", "Sets Vision To: ^1Airport_Exterior", ::set_vision, "airport_exterior" );
+            self add_option( "Set Vision: ^1Airport_Green", "Sets Vision To: ^1Airport_Green", ::set_vision, "airport_green" );
+            self add_option( "Set Vision: ^1Armada", "Sets Vision To: ^1Armada", ::set_vision, "armada" );
+            self add_option( "Set Vision: ^1Armada_Ground", "Sets Vision To: ^1Armada_Ground", ::set_vision, "armada_ground" );
+            self add_option( "Set Vision: ^1Armada_Helitransition", "Sets Vision To: ^1Armada_Helitransition", ::set_vision, "armada_helitransition" );
+            self add_option( "Set Vision: ^1Armada_Hq", "Sets Vision To: ^1Armada_Hq", ::set_vision, "armada_hq" );
+            self add_option( "Set Vision: ^1Armada_Ride", "Sets Vision To: ^1Armada_Ride", ::set_vision, "armada_ride" );
+            self add_option( "Set Vision: ^1Armada_Sound", "Sets Vision To: ^1Armada_Sound", ::set_vision, "armada_sound" );
+            self add_option( "Set Vision: ^1Berlin", "Sets Vision To: ^1Berlin", ::set_vision, "berlin" );
+            self add_option( "Set Vision: ^1Bigcity_Destroyed", "Sets Vision To: ^1Bigcity_Destroyed", ::set_vision, "bigcity_destroyed" );
+            self add_option( "Set Vision: ^1Blackout_Darkness", "Sets Vision To: ^1Blackout_Darkness", ::set_vision, "blackout_darkness" );
+            self add_option( "Set Vision: ^1Blackout_Nightvision", "Sets Vision To: ^1Blackout_Nightvision", ::set_vision, "blackout_nightvision" );
+            self add_option( "Set Vision: ^1Blackout_Nvg", "Sets Vision To: ^1Blackout_Nvg", ::set_vision, "blackout_nvg" );
+            self add_option( "Set Vision: ^1Blacktest", "Sets Vision To: ^1Blacktest", ::set_vision, "blacktest" );
+            self add_option( "Set Vision: ^1Bog", "Sets Vision To: ^1Bog", ::set_vision, "bog" );
+            self add_option( "Set Vision: ^1Bog_A_Sunrise", "Sets Vision To: ^1Bog_A_Sunrise", ::set_vision, "bog_a_sunrise" );
+            self add_option( "Set Vision: ^1Boneyard", "Sets Vision To: ^1Boneyard", ::set_vision, "boneyard" );
+            self add_option( "Set Vision: ^1Boneyard_Flyby", "Sets Vision To: ^1Boneyard_Flyby", ::set_vision, "boneyard_flyby" );
+            self add_option( "Set Vision: ^1Bridge", "Sets Vision To: ^1Bridge", ::set_vision, "bridge" );
+            self add_option( "Set Vision: ^1Cargoship", "Sets Vision To: ^1Cargoship", ::set_vision, "cargoship" );
+            self add_option( "Set Vision: ^1Cheat_Bw", "Sets Vision To: ^1Cheat_Bw", ::set_vision, "cheat_bw" );
+            self add_option( "Set Vision: ^1Cheat_Bw_Contrast", "Sets Vision To: ^1Cheat_Bw_Contrast", ::set_vision, "cheat_bw_contrast" );
+            self add_option( "Set Vision: ^1Cheat_Bw_Invert_Contrast", "Sets Vision To: ^1Cheat_Bw_Invert_Contrast", ::set_vision, "cheat_bw_invert_contrast" );
+            self add_option( "Set Vision: ^1Cheat_Chaplinnight", "Sets Vision To: ^1Cheat_Chaplinnight", ::set_vision, "cheat_chaplinnight" );
+            self add_option( "Set Vision: ^1Cheat_Contrast", "Sets Vision To: ^1Cheat_Contrast", ::set_vision, "cheat_contrast" );
+            self add_option( "Set Vision: ^1Cheat_Contrast_Night", "Sets Vision To: ^1Cheat_Contrast_Night", ::set_vision, "cheat_contrast_night" );
+            self add_option( "Set Vision: ^1Cheat_Invert", "Sets Vision To: ^1Cheat_Invert", ::set_vision, "cheat_invert" );
+            self add_option( "Set Vision: ^1Cliffhanger", "Sets Vision To: ^1Cliffhanger", ::set_vision, "cliffhanger" );
+            self add_option( "Set Vision: ^1Cobrapilot", "Sets Vision To: ^1Cobrapilot", ::set_vision, "cobrapilot" );
+            self add_option( "Set Vision: ^1Cobra_Down", "Sets Vision To: ^1Cobra_Down", ::set_vision, "cobra_down" );
+            self add_option( "Set Vision: ^1Cobra_Sunset1", "Sets Vision To: ^1Cobra_Sunset1", ::set_vision, "cobra_sunset1" );
+            self add_option( "Set Vision: ^1Cobra_Sunset2", "Sets Vision To: ^1Cobra_Sunset2", ::set_vision, "cobra_sunset2" );
+            self add_option( "Set Vision: ^1Cobra_Sunset3", "Sets Vision To: ^1Cobra_Sunset3", ::set_vision, "cobra_sunset3" );
+            self add_option( "Set Vision: ^1Contingency", "Sets Vision To: ^1Contingency", ::set_vision, "contingency" );
+            self add_option( "Set Vision: ^1Contingency_Thermal_Inverted", "Sets Vision To: ^1Contingency_Thermal_Inverted", ::set_vision, "contingency_thermal_inverted" );
+            self add_option( "Set Vision: ^1Coup", "Sets Vision To: ^1Coup", ::set_vision, "coup" );
+            self add_option( "Set Vision: ^1Coup_Hit", "Sets Vision To: ^1Coup_Hit", ::set_vision, "coup_hit" );
+            self add_option( "Set Vision: ^1Coup_Sunblind", "Sets Vision To: ^1Coup_Sunblind", ::set_vision, "coup_sunblind" );
+            self add_option( "Set Vision: ^1Co_Break", "Sets Vision To: ^1Co_Break", ::set_vision, "co_break" );
+            self add_option( "Set Vision: ^1Co_Overgrown", "Sets Vision To: ^1Co_Overgrown", ::set_vision, "co_overgrown" );
+            self add_option( "Set Vision: ^1Dcburning_Bunker", "Sets Vision To: ^1Dcburning_Bunker", ::set_vision, "dcburning_bunker" );
+            self add_option( "Set Vision: ^1Dcburning_Commerce", "Sets Vision To: ^1Dcburning_Commerce", ::set_vision, "dcburning_commerce" );
+            self add_option( "Set Vision: ^1Dcburning_Crash", "Sets Vision To: ^1Dcburning_Crash", ::set_vision, "dcburning_crash" );
+            self add_option( "Set Vision: ^1Dcemp", "Sets Vision To: ^1Dcemp", ::set_vision, "dcemp" );
+            self add_option( "Set Vision: ^1Dcemp_Emp", "Sets Vision To: ^1Dcemp_Emp", ::set_vision, "dcemp_emp" );
+            self add_option( "Set Vision: ^1Dcemp_Iss", "Sets Vision To: ^1Dcemp_Iss", ::set_vision, "dcemp_iss" );
+            self add_option( "Set Vision: ^1Dcemp_Iss_Death", "Sets Vision To: ^1Dcemp_Iss_Death", ::set_vision, "dcemp_iss_death" );
+            self add_option( "Set Vision: ^1Dcemp_Postemp", "Sets Vision To: ^1Dcemp_Postemp", ::set_vision, "dcemp_postemp" );
+            self add_option( "Set Vision: ^1Dcemp_Postemp2", "Sets Vision To: ^1Dcemp_Postemp2", ::set_vision, "dcemp_postemp2" );
+            self add_option( "Set Vision: ^1Dcemp_Tunnels", "Sets Vision To: ^1Dcemp_Tunnels", ::set_vision, "dcemp_tunnels" );
+            self add_option( "Set Vision: ^1Default", "Sets Vision To: ^1Default", ::set_vision, "default" );
+            self add_option( "Set Vision: ^1Default_Night", "Sets Vision To: ^1Default_Night", ::set_vision, "default_night" );
+            self add_option( "Set Vision: ^1Default_Night_mp", "Sets Vision To: ^1Default_Night_mp", ::set_vision, "default_night_mp" );
+            self add_option( "Set Vision: ^1Dna_Bomb", "Sets Vision To: ^1Dna_Bomb", ::set_vision, "dna_bomb" );
+            self add_option( "Set Vision: ^1Downtown_La", "Sets Vision To: ^1Downtown_La", ::set_vision, "downtown_la" );
+            self add_option( "Set Vision: ^1Drone_Swarm", "Sets Vision To: ^1Drone_Swarm", ::set_vision, "drone_swarm" );
+            self add_option( "Set Vision: ^1End_Game", "Sets Vision To: ^1End_Game", ::set_vision, "end_game" );
+            self add_option( "Set Vision: ^1End_Game2", "Sets Vision To: ^1End_Game2", ::set_vision, "end_game2" );
+            self add_option( "Set Vision: ^1Exterior_Concept", "Sets Vision To: ^1Exterior_Concept", ::set_vision, "exterior_concept" );
+            self add_option( "Set Vision: ^1Generic_Underwater", "Sets Vision To: ^1Generic_Underwater", ::set_vision, "generic_underwater" );
+            self add_option( "Set Vision: ^1Grayscale", "Sets Vision To: ^1Grayscale", ::set_vision, "grayscale" );
+            self add_option( "Set Vision: ^1Gulag", "Sets Vision To: ^1Gulag", ::set_vision, "gulag" );
+            self add_option( "Set Vision: ^1Helicopter_Ride", "Sets Vision To: ^1Helicopter_Ride", ::set_vision, "helicopter_ride" );
+            self add_option( "Set Vision: ^1Hunted_Crash", "Sets Vision To: ^1Hunted_Crash", ::set_vision, "hunted_crash" );
+            self add_option( "Set Vision: ^1Icbm_Nightvision", "Sets Vision To: ^1Icbm_Nightvision", ::set_vision, "icbm_nightvision" );
+            self add_option( "Set Vision: ^1Interior_Concept", "Sets Vision To: ^1Interior_Concept", ::set_vision, "interior_concept" );
+            self add_option( "Set Vision: ^1Introscreen", "Sets Vision To: ^1Introscreen", ::set_vision, "introscreen" );
+            self add_option( "Set Vision: ^1Invasion", "Sets Vision To: ^1Invasion", ::set_vision, "invasion" );
+            self add_option( "Set Vision: ^1Jeepride", "Sets Vision To: ^1Jeepride", ::set_vision, "jeepride" );
+            self add_option( "Set Vision: ^1Jeepride_Flyaway", "Sets Vision To: ^1Jeepride_Flyaway", ::set_vision, "jeepride_flyaway" );
+            self add_option( "Set Vision: ^1Jeepride_Tunnel", "Sets Vision To: ^1Jeepride_Tunnel", ::set_vision, "jeepride_tunnel" );
+            self add_option( "Set Vision: ^1Jeepride_Zak", "Sets Vision To: ^1Jeepride_Zak", ::set_vision, "jeepride_zak" );
+            self add_option( "Set Vision: ^1Killhouse", "Sets Vision To: ^1Killhouse", ::set_vision, "killhouse" );
+            self add_option( "Set Vision: ^1Killhouse_Interior", "Sets Vision To: ^1Killhouse_Interior", ::set_vision, "killhouse_interior" );
+            self add_option( "Set Vision: ^1London", "Sets Vision To: ^1London", ::set_vision, "london" );
+            self add_option( "Set Vision: ^1Missilecam", "Sets Vision To: ^1Missilecam", ::set_vision, "missilecam" );
+            self add_option( "Set Vision: ^1mpintro", "Sets Vision To: ^1mpintro", ::set_vision, "mpintro" );
+            self add_option( "Set Vision: ^1mpnuke_Aftermath", "Sets Vision To: ^1mpnuke_Aftermath", ::set_vision, "mpnuke_aftermath" );
+            self add_option( "Set Vision: ^1Nate_Test", "Sets Vision To: ^1Nate_Test", ::set_vision, "nate_test" );
+            self add_option( "Set Vision: ^1Near_Death", "Sets Vision To: ^1Near_Death", ::set_vision, "near_death" );
+            self add_option( "Set Vision: ^1Near_Death_Hdr", "Sets Vision To: ^1Near_Death_Hdr", ::set_vision, "near_death_hdr" );
+            self add_option( "Set Vision: ^1Near_Death_mp", "Sets Vision To: ^1Near_Death_mp", ::set_vision, "near_death_mp" );
+            self add_option( "Set Vision: ^1Ny_Harbor", "Sets Vision To: ^1Ny_Harbor", ::set_vision, "ny_harbor" );
+            self add_option( "Set Vision: ^1Oilrig_Exterior_Deck0", "Sets Vision To: ^1Oilrig_Exterior_Deck0", ::set_vision, "oilrig_exterior_deck0" );
+            self add_option( "Set Vision: ^1Oilrig_Exterior_Heli", "Sets Vision To: ^1Oilrig_Exterior_Heli", ::set_vision, "oilrig_exterior_heli" );
+            self add_option( "Set Vision: ^1Oilrig_Underwater", "Sets Vision To: ^1Oilrig_Underwater", ::set_vision, "oilrig_underwater" );
+            self add_option( "Set Vision: ^1School", "Sets Vision To: ^1School", ::set_vision, "school" );
+            self add_option( "Set Vision: ^1Seaknight_Assault", "Sets Vision To: ^1Seaknight_Assault", ::set_vision, "seaknight_assault" );
+            self add_option( "Set Vision: ^1Sepia", "Sets Vision To: ^1Sepia", ::set_vision, "sepia" );
+            self add_option( "Set Vision: ^1So_Bridge", "Sets Vision To: ^1So_Bridge", ::set_vision, "so_bridge" );
+            self add_option( "Set Vision: ^1Strike", "Sets Vision To: ^1Strike", ::set_vision, "strike" );
+            self add_option( "Set Vision: ^1Thermal_mp", "Sets Vision To: ^1Thermal_mp", ::set_vision, "thermal_mp" );
+            self add_option( "Set Vision: ^1Trainer_Pit", "Sets Vision To: ^1Trainer_Pit", ::set_vision, "trainer_pit" );
+            self add_option( "Set Vision: ^1Trainer_Start", "Sets Vision To: ^1Trainer_Start", ::set_vision, "trainer_start" );
+            self add_option( "Set Vision: ^1Tulsa", "Sets Vision To: ^1Tulsa", ::set_vision, "tulsa" );
+            self add_option( "Set Vision: ^1Warlord", "Sets Vision To: ^1Warlord", ::set_vision, "warlord" );
+            self add_option( "Set Vision: ^1Wetwork", "Sets Vision To: ^1Wetwork", ::set_vision, "wetwork" );
+            self add_option( "Set Vision: ^1Whitehouse", "Sets Vision To: ^1Whitehouse", ::set_vision, "whitehouse" );
+			break;
+        case "Vehicle Spawning":
+            self add_menu( menu );
+            self add_option( "Any ^7(^1TODO^7)", "^:Any Level Vehicles", ::new_menu, "Any Vehicles" );
+			self add_option( "FNG ^7(^3WIP^7)", "^:FNG Vehicles", ::new_menu, "FNG Vehicles" );
+            self add_option( "Crew Expendable ^7(^1TODO^7)", "^:Crew Expendable Vehicles", ::new_menu, "Crew Expendable Vehicles" );
+            self add_option( "The Coup ^7(^1TODO^7)", "^:The Coup Vehicles", ::new_menu, "The Coup Vehicles" );
+            self add_option( "Blackout ^7(^1TODO^7)", "^:Blackout Vehicles", ::new_menu, "Blackout Vehicles" );
+            self add_option( "Charlie Dont Surf ^7(^1TODO^7)", "^:Charlie Dont Surf Vehicles", ::new_menu, "Charlie Dont Surf Vehicles" );
+            self add_option( "The Bog ^7(^1TODO^7)", "^:The Bog Vehicles", ::new_menu, "The Bog Vehicles" );
+            self add_option( "Hunted ^7(^1TODO^7)", "^:Hunted Vehicles", ::new_menu, "Hunted Vehicles" );
+            self add_option( "Death From Above ^7(^1TODO^7)", "^:Death From Above Vehicles", ::new_menu, "Death From Above Vehicles" );
+            self add_option( "War Pig ^7(^1TODO^7)", "^:War Pig Vehicles", ::new_menu, "War Pig Vehicles" );
+            self add_option( "Shock And Awe ^7(^1TODO^7)", "^:Shock And Awe Vehicles", ::new_menu, "Shock And Awe Vehicles" );
+            self add_option( "Safehouse ^7(^1TODO^7)", "^:Safehouse Vehicles", ::new_menu, "Safehouse Vehicles" );
+            self add_option( "All Ghillied Up ^7(^1TODO^7)", "^:All Ghillied Up Vehicles", ::new_menu, "All Ghillied Up Vehicles" );
+            self add_option( "One Shot One Kill ^7(^1TODO^7)", "^:One Shot One Kill Vehicles", ::new_menu, "One Shot One Kill Vehicles" );
+            self add_option( "Heat ^7(^1TODO^7)", "^:Heat Vehicles", ::new_menu, "Heat Vehicles" );
+            self add_option( "The Sins Of The Father ^7(^1TODO^7)", "^:The Sins Of The Father Vehicles", ::new_menu, "The Sins Of The Father Vehicles" );
+            self add_option( "Ultimatum ^7(^1TODO^7)", "^:Ultimatum Vehicles", ::new_menu, "Ultimatum Vehicles" );
+            self add_option( "All In ^7(^1TODO^7)", "^:All In Vehicles", ::new_menu, "All In Vehicles" );
+            self add_option( "No Fighting In The War Room ^7(^1TODO^7)", "^:No Fighting In The War Room Vehicles", ::new_menu, "No Fighting In The War Room Vehicles" );
+            self add_option( "Game Over ^7(^1TODO^7)", "^:Game Over Vehicles", ::new_menu, "Game Over Vehicles" );
+            break;
+        case "Any Vehicles":
+            self add_menu( menu );
+            break;
+        case "FNG Vehicles":
+            self add_menu( menu );
+			self add_option( "Abrams", "^:Spawns An Abrams ^7(^1Can Only Look Around^7)", ::spawn_script_vehicle_drivable, "abrams" );
+            self add_option( "Seaknight", "^:Spawns A Seaknight ^7(^3Flyable But Hard To See^7)", ::spawn_script_vehicle_drivable, "IntroSeaknight" );
+            self add_option( "BM21", "^:Spawns A BM21 ^7(^3A Little Hard To See^7)", ::spawn_script_vehicle_drivable, "bm21_loop_01" );
+            break;
+        case "Weapons":
+            self add_menu( menu );
+            self add_option( "Give All Weapons", "^:Gives All Weapons (Can't Hold All Weapons!)", ::give_all, "" );
+            //self add_option( "Give All Weapons 2", "^:Gives All Weapons (Can't Hold All Weapons!)", ::give_all_weapons, "" );
+            self add_option( "Spawn All Weapons", "^:Spawns All Weapons On Ground (^1Crashes Some Maps!^:)", ::spawn_all_weapons, "" );
+            self add_option( "Any", "^:Any Level Weapons", ::new_menu, "Any Weapons" );
+			self add_option( "FNG", "^:FNG Weapons", ::new_menu, "FNG Weapons" );
+            self add_option( "Crew Expendable", "^:Crew Expendable Weapons", ::new_menu, "Crew Expendable Weapons" );
+            self add_option( "The Coup", "^:The Coup Weapons", ::new_menu, "The Coup Weapons" );
+            self add_option( "Blackout", "^:Blackout Weapons", ::new_menu, "Blackout Weapons" );
+            self add_option( "Charlie Dont Surf", "^:Charlie Dont Surf Weapons", ::new_menu, "Charlie Dont Surf Weapons" );
+            self add_option( "The Bog", "^:The Bog Weapons", ::new_menu, "The Bog Weapons" );
+            self add_option( "Hunted", "^:Hunted Weapons", ::new_menu, "Hunted Weapons" );
+            self add_option( "Death From Above", "^:Death From Above Weapons", ::new_menu, "Death From Above Weapons" );
+            self add_option( "War Pig", "^:War Pig Weapons", ::new_menu, "War Pig Weapons" );
+            self add_option( "Shock And Awe", "^:Shock And Awe Weapons", ::new_menu, "Shock And Awe Weapons" );
+            self add_option( "Aftermath", "^:Aftermath Weapons", ::new_menu, "Aftermath Weapons" );
+            self add_option( "Safehouse", "^:Safehouse Weapons", ::new_menu, "Safehouse Weapons" );
+            self add_option( "All Ghillied Up", "^:All Ghillied Up Weapons", ::new_menu, "All Ghillied Up Weapons" );
+            self add_option( "One Shot One Kill", "^:One Shot One Kill Weapons", ::new_menu, "One Shot One Kill Weapons" );
+            self add_option( "Heat", "^:Heat Weapons", ::new_menu, "Heat Weapons" );
+            self add_option( "The Sins Of The Father", "^:The Sins Of The Father Weapons", ::new_menu, "The Sins Of The Father Weapons" );
+            self add_option( "Ultimatum", "^:Ultimatum Weapons", ::new_menu, "Ultimatum Weapons" );
+            self add_option( "All In", "^:All In Weapons", ::new_menu, "All In Weapons" );
+            self add_option( "No Fighting In The War Room", "^:No Fighting In The War Room Weapons", ::new_menu, "No Fighting In The War Room Weapons" );
+            self add_option( "Game Over", "^:Game Over Weapons", ::new_menu, "Game Over Weapons" );
+            self add_option( "Mile High Club", "^:Mile High Club Weapons", ::new_menu, "Mile High Club Weapons" );
+            break;
+        case "Any Weapons":
+            self add_menu( menu );
+            self add_option( "None", "^:Give ^1None", ::give_weapon, "none" );
+            self add_option( "Default Weapon", "^:Give ^1Default Weapon", ::give_weapon, "defaultweapon" );
+            self add_option( "Flash Grenade", "^:Give ^1Flash Grenade", ::give_weapon, "flash_grenade" );
+            self add_option( "Frag Grenade", "^:Give ^1Frag Grenade", ::give_weapon, "fraggrenade" );
+            self add_option( "MP5", "^:Give ^1MP5", ::give_weapon, "mp5" );
+            self add_option( "RPG", "^:Give ^1RPG", ::give_weapon, "rpg" );
+            self add_option( "RPG Player", "^:Give ^1RPG Player", ::give_weapon, "rpg_player" );
+            self add_option( "Smoke Grenade American", "^:Give ^1Smoke Grenade American", ::give_weapon, "smoke_grenade_american" );
+            self add_option( "Camera 5fov", "^:Give ^1Camera 5fov", ::give_weapon, "camera_5fov" );
+            self add_option( "Camera 10fov", "^:Give ^1Camera 10fov", ::give_weapon, "camera_10fov" );
+            self add_option( "Camera 20fov", "^:Give ^1Camera 20fov", ::give_weapon, "camera_20fov" );
+            self add_option( "Camera 30fov", "^:Give ^1Camera 30fov", ::give_weapon, "camera_30fov" );
+            self add_option( "Camera 45fov", "^:Give ^1Camera 45fov", ::give_weapon, "camera_45fov" );
+            break;
+        case "FNG Weapons":
+            self add_menu( menu );
+			self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+			self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+			self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "M16 Basic", "^:Give ^1M16 Basic", ::give_weapon, "m16_basic" );
+            self add_option( "M16 Grenadier", "^:Give ^1M16 Grenadier", ::give_weapon, "m16_grenadier" );
+            self add_option( "MP5 Muzzle Small", "^:Give ^1MP5 Muzzle Small", ::give_weapon, "mp5_muzzle_small" );
+            self add_option( "MP5 Silencer", "^:Give ^1MP5 Silencer", ::give_weapon, "mp5_silencer" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Crew Expendable Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+			self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+			self add_option( "Desert Eagle Cargoship", "^:Give ^1Desert Eagle Cargoship", ::give_weapon, "deserteagle_cgoship" );
+            self add_option( "Face Mask", "^:Give ^1Face Mask", ::give_weapon, "facemask" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "MP5 Silencer", "^:Give ^1MP5 Silencer", ::give_weapon, "mp5_silencer" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "RPG Straight", "^:Give ^1RPG Straight", ::give_weapon, "rpg_straight" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "The Coup Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+			self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Desert Eagle", "^:Give ^1Desert Eagle", ::give_weapon, "deserteagle" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "Blackout Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4M203 Silencer Reflex", "^:Give ^1M4M203 Silencer Reflex", ::give_weapon, "m4m203_silencer_reflex" );
+            self add_option( "M14 Scoped Silencer Woodland", "^:Give ^1M14 Scoped Silencer Woodland", ::give_weapon, "m14_scoped_silencer_woodland" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "Skorpion", "^:Give ^1Skorpion", ::give_weapon, "skorpion" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "Charlie Dont Surf Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+            self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M16 Grenadier", "^:Give ^1M16 Grenadier", ::give_weapon, "m16_grenadier" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "The Bog Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "Javelin", "^:Give ^1Javelin", ::give_weapon, "javelin" );
+            self add_option( "Javelin Objective", "^:Give ^1Javelin Objective", ::give_weapon, "javelin_objective" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "m14_scoped", "^:Give ^1m14_scoped", ::give_weapon, "m14_scoped" );
+            self add_option( "M16 Grenadier", "^:Give ^1M16 Grenadier", ::give_weapon, "m16_grenadier" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "rpg_straight", "^:Give ^1rpg_straight", ::give_weapon, "rpg_straight" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Hunted Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+			self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "Stinger", "^:Give ^1Stinger", ::give_weapon, "stinger" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "Death From Above Weapons":
+            self add_menu( menu );
+			self add_option( "AC130 25mm", "^:Give ^1AC130 25mm", ::give_weapon, "ac130_25mm" );
+            self add_option( "AC130 40mm", "^:Give ^1AC130 40mm", ::give_weapon, "ac130_40mm" );
+            self add_option( "AC130 105mm", "^:Give ^1AC130 105mm", ::give_weapon, "ac130_105mm" );
+            self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            break;
+        case "War Pig Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M16 Basic", "^:Give ^1M16 Basic", ::give_weapon, "m16_basic" );
+            self add_option( "M16 Grenadier", "^:Give ^1M16 Grenadier", ::give_weapon, "m16_grenadier" );
+            self add_option( "Remote Missile", "^:Give ^1Remote Missile", ::give_weapon, "remote_missile" );
+            self add_option( "Remote Missile Detonator", "^:Give ^1Remote Missile Detonator", ::give_weapon, "remote_missile_detonator" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            break;
+        case "Shock And Awe Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Crash Missile Airlift", "^:Give ^1Crash Missile Airlift", ::give_weapon, "crash_missile_airlift" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M4 Grunt Muzzle Small", "^:Give ^1M4 Grunt Muzzle Small", ::give_weapon, "m4_grunt_muzzle_small" );
+            self add_option( "M16 Grenadier", "^:Give ^1M16 Grenadier", ::give_weapon, "m16_grenadier" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "RPD Muzzle Small", "^:Give ^1RPD Muzzle Small", ::give_weapon, "rpd_muzzle_small" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "Saw Muzzle Small", "^:Give ^1Saw Muzzle Small", ::give_weapon, "saw_muzzle_small" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Aftermath Weapons":
+            self add_menu( menu );
+			self add_option( "Default Weapon", "^:Give ^1Default Weapon", ::give_weapon, "defaultweapon" );
+            self add_option( "RPG", "^:Give ^1RPG", ::give_weapon, "rpg" );
+            self add_option( "RPG Player", "^:Give ^1RPG Player", ::give_weapon, "rpg_player" );
+            break;
+        case "Safehouse Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Cobra Air Support", "^:Give ^1Cobra Air Support", ::give_weapon, "cobra_air_support" );
+            self add_option( "Colt 45 Alasad Killer", "^:Give ^1Colt 45 Alasad Killer", ::give_weapon, "colt45_alasad_killer" );
+            self add_option( "Desert Eagle", "^:Give ^1Desert Eagle", ::give_weapon, "deserteagle" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "Javelin", "^:Give ^1Javelin", ::give_weapon, "javelin" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "M4M203 Silencer Reflex", "^:Give ^1M4M203 Silencer Reflex", ::give_weapon, "m4m203_silencer_reflex" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "MI28 FFAR Village Assault", "^:Give ^1MI28 FFAR Village Assault", ::give_weapon, "mi28_ffar_village_assault" );
+            self add_option( "MP5 Silencer", "^:Give ^1MP5 Silencer", ::give_weapon, "mp5_silencer" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "All Ghillied Up Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M14 Scoped Silencer", "^:Give ^1M14 Scoped Silencer", ::give_weapon, "m14_scoped_silencer" );
+            self add_option( "M14 Scoped Silencer Woodland", "^:Give ^1M14 Scoped Silencer Woodland", ::give_weapon, "m14_scoped_silencer_woodland" );
+            self add_option( "P90 Silencer", "^:Give ^1P90 Silencer", ::give_weapon, "p90_silencer" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "Stinger", "^:Give ^1Stinger", ::give_weapon, "stinger" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            break;
+        case "One Shot One Kill Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "M14 Scoped Woodland", "^:Give ^1M14 Scoped Woodland", ::give_weapon, "m14_scoped_woodland" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Heat Weapons":
+            self add_menu( menu );
+            self add_option( "Airstrike Support", "^:Give ^1Airstrike Support", ::give_weapon, "airstrike_support" );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "Javelin", "^:Give ^1Javelin", ::give_weapon, "javelin" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M14 Scoped Woodland", "^:Give ^1M14 Scoped Woodland", ::give_weapon, "m14_scoped_woodland" );
+            self add_option( "P90", "^:Give ^1P90", ::give_weapon, "p90" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            break;
+        case "The Sins Of The Father Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "Remington 700", "^:Give ^1Remington 700", ::give_weapon, "remington700" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "Skorpion", "^:Give ^1Skorpion", ::give_weapon, "skorpion" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi Silencer", "^:Give ^1Uzi Silencer", ::give_weapon, "uzi_sd" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Ultimatum Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK74U", "^:Give ^1AK74U", ::give_weapon, "ak74u" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "M4M203 Silencer", "^:Give ^1M4M203 Silencer", ::give_weapon, "m4m203_silencer" );
+            self add_option( "M4M203 Silencer Reflex", "^:Give ^1M4M203 Silencer Reflex", ::give_weapon, "m4m203_silencer_reflex" );
+            self add_option( "M14 Scoped Woodland", "^:Give ^1M14 Scoped Woodland", ::give_weapon, "m14_scoped_woodland" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "MP5 Silencer", "^:Give ^1MP5 Silencer", ::give_weapon, "mp5_silencer" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "All In Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Dragunov", "^:Give ^1Dragunov", ::give_weapon, "dragunov" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "Javelin", "^:Give ^1Javelin", ::give_weapon, "javelin" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M4M203 Silencer Reflex", "^:Give ^1M4M203 Silencer Reflex", ::give_weapon, "m4m203_silencer_reflex" );
+            self add_option( "M14 Scoped", "^:Give ^1M14 Scoped", ::give_weapon, "m14_scoped" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "RPD", "^:Give ^1RPD", ::give_weapon, "rpd" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            break;
+        case "No Fighting In The War Room Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "C4", "^:Give ^1C4", ::give_weapon, "c4" );
+            self add_option( "Claymore", "^:Give ^1Claymore", ::give_weapon, "claymore" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "G3", "^:Give ^1G3", ::give_weapon, "g3" );
+            self add_option( "G36C", "^:Give ^1G36C", ::give_weapon, "g36c" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "M4M203 Silencer Reflex", "^:Give ^1M4M203 Silencer Reflex", ::give_weapon, "m4m203_silencer_reflex" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            break;
+        case "Game Over Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+			self add_option( "AK47 Grenadier", "^:Give ^1AK47 Grenadier", ::give_weapon, "ak47_grenadier" );
+			self add_option( "AK47 Zakhaev Buddy", "^:Give ^1AK47 Zakhaev Buddy", ::give_weapon, "ak47_jeeprideending_zakhaevbuddy2" );
+            self add_option( "AK47 Muzzle Nodynlight", "^:Give ^1AK47 Muzzle Nodynlight", ::give_weapon, "ak47_muzzle_nodynlight" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Beretta Muzzle Nodynlight", "^:Give ^1Beretta Muzzle Nodynlight", ::give_weapon, "beretta_muzzle_nodynlight" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Colt 45 Zak Killer", "^:Give ^1Colt 45 Zak Killer", ::give_weapon, "colt45_zak_killer" );
+            self add_option( "Desert Eagle", "^:Give ^1Desert Eagle", ::give_weapon, "deserteagle" );
+            self add_option( "M4 Grenadier", "^:Give ^1M4 Grenadier", ::give_weapon, "m4_grenadier" );
+            self add_option( "M4 Grunt", "^:Give ^1M4 Grunt", ::give_weapon, "m4_grunt" );
+            self add_option( "M60E4 Zakhaev Buddy", "^:Give ^1M60E4 Zakhaev Buddy", ::give_weapon, "m60e4_jeeprideending_zakhaevbuddy1" );
+            self add_option( "M60E4 Muzzle Nodynlight", "^:Give ^1M60E4 Muzzle Nodynlight", ::give_weapon, "m60e4_muzzle_nodynlight" );
+            self add_option( "RPD Muzzle Nodynlight", "^:Give ^1RPD Muzzle Nodynlight", ::give_weapon, "rpd_muzzle_nodynlight" );
+            self add_option( "RPG Jeepride", "^:Give ^1RPG Jeepride", ::give_weapon, "rpg_jeepride" );
+            self add_option( "SAW", "^:Give ^1SAW", ::give_weapon, "saw" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            break;
+        case "Mile High Club Weapons":
+            self add_menu( menu );
+			self add_option( "AK47", "^:Give ^1AK47", ::give_weapon, "ak47" );
+            self add_option( "Beretta", "^:Give ^1Beretta", ::give_weapon, "beretta" );
+            self add_option( "Colt 45", "^:Give ^1Colt 45", ::give_weapon, "colt45" );
+            self add_option( "Face Mask", "^:Give ^1Face Mask", ::give_weapon, "facemask" );
+            self add_option( "M4 Silencer", "^:Give ^1M4 Silencer", ::give_weapon, "m4_silencer" );
+            self add_option( "M1014", "^:Give ^1M1014", ::give_weapon, "m1014" );
+            self add_option( "MP5 Silencer", "^:Give ^1MP5 Silencer", ::give_weapon, "mp5_silencer" );
+            self add_option( "P90", "^:Give ^1P90", ::give_weapon, "p90" );
+            self add_option( "Skorpion", "^:Give ^1Skorpion", ::give_weapon, "skorpion" );
+            self add_option( "USP", "^:Give ^1USP", ::give_weapon, "usp" );
+            self add_option( "USP Silencer", "^:Give ^1USP Silencer", ::give_weapon, "usp_silencer" );
+            self add_option( "Uzi", "^:Give ^1Uzi", ::give_weapon, "uzi" );
+            self add_option( "Winchester 1200", "^:Give ^1Winchester 1200", ::give_weapon, "winchester1200" );
+            break;
+        case "Projectiles":
+            self add_menu( menu );
+            self add_option( "Default", "^:Reset Weapon Projectile", ::set_projectile, "Default" );
+            self add_option( "Any", "^:Any Level Projectiles", ::new_menu, "Any Projectiles" );
+			self add_option( "FNG", "^:FNG Projectiles", ::new_menu, "FNG Projectiles" );
+            self add_option( "Crew Expendable", "^:Crew Expendable Projectiles", ::new_menu, "Crew Expendable Projectiles" );
+            self add_option( "The Coup", "^:The Coup Projectiles", ::new_menu, "The Coup Projectiles" );
+            self add_option( "Blackout", "^:Blackout Projectiles", ::new_menu, "Blackout Projectiles" );
+            self add_option( "Charlie Dont Surf", "^:Charlie Dont Surf Projectiles", ::new_menu, "Charlie Dont Surf Projectiles" );
+            self add_option( "The Bog", "^:The Bog Projectiles", ::new_menu, "The Bog Projectiles" );
+            self add_option( "Hunted", "^:Hunted Projectiles", ::new_menu, "Hunted Projectiles" );
+            self add_option( "Death From Above", "^:Death From Above Projectiles", ::new_menu, "Death From Above Projectiles" );
+            self add_option( "War Pig", "^:War Pig Projectiles", ::new_menu, "War Pig Projectiles" );
+            self add_option( "Shock And Awe", "^:Shock And Awe Projectiles", ::new_menu, "Shock And Awe Projectiles" );
+            self add_option( "Aftermath", "^:Aftermath Projectiles", ::new_menu, "Aftermath Projectiles" );
+            self add_option( "Safehouse", "^:Safehouse Projectiles", ::new_menu, "Safehouse Projectiles" );
+            self add_option( "All Ghillied Up", "^:All Ghillied Up Projectiles", ::new_menu, "All Ghillied Up Projectiles" );
+            self add_option( "One Shot One Kill", "^:One Shot One Kill Projectiles", ::new_menu, "One Shot One Kill Projectiles" );
+            self add_option( "Heat", "^:Heat Projectiles", ::new_menu, "Heat Projectiles" );
+            self add_option( "The Sins Of The Father", "^:The Sins Of The Father Projectiles", ::new_menu, "The Sins Of The Father Projectiles" );
+            self add_option( "Ultimatum", "^:Ultimatum Projectiles", ::new_menu, "Ultimatum Projectiles" );
+            self add_option( "All In", "^:All In Projectiles", ::new_menu, "All In Projectiles" );
+            self add_option( "No Fighting In The War Room", "^:No Fighting In The War Room Projectiles", ::new_menu, "No Fighting In The War Room Projectiles" );
+            self add_option( "Game Over", "^:Game Over Projectiles", ::new_menu, "Game Over Projectiles" );
+            self add_option( "Mile High Club", "^:Mile High Club Projectiles", ::new_menu, "Mile High Club Projectiles" );
+            break;
+        case "Any Projectiles":
+            self add_menu( menu );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "FNG Projectiles":
+            self add_menu( menu );
+            self add_option( "littlebird_gunpod", "^:Set Projectile: ^1littlebird_gunpod", ::set_projectile, "littlebird_gunpod" );
+            self add_option( "m1a1_coaxial_mg", "^:Set Projectile: ^1m1a1_coaxial_mg", ::set_projectile, "m1a1_coaxial_mg" );
+            self add_option( "turret_attackheli", "^:Set Projectile: ^1turret_attackheli", ::set_projectile, "turret_attackheli" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Crew Expendable Projectiles":
+            self add_menu( menu );
+			self add_option( "heli_minigun_noai", "^:Set Projectile: ^1heli_minigun_noai", ::set_projectile, "heli_minigun_noai" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "rpg_straight", "^:Set Projectile: ^1rpg_straight", ::set_projectile, "rpg_straight" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "The Coup Projectiles":
+            self add_menu( menu );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+			self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Blackout Projectiles":
+            self add_menu( menu );
+            self add_option( "bm21_missile", "^:Set Projectile: ^1bm21_missile", ::set_projectile, "bm21_missile" );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Charlie Dont Surf Projectiles":
+            self add_menu( menu );
+            self add_option( "50cal_turret_technical", "^:Set Projectile: ^150cal_turret_technical", ::set_projectile, "50cal_turret_technical" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "heli_minigun_noai", "^:Set Projectile: ^1heli_minigun_noai", ::set_projectile, "heli_minigun_noai" );
+            self add_option( "m1a1_coaxial_mg", "^:Set Projectile: ^1m1a1_coaxial_mg", ::set_projectile, "m1a1_coaxial_mg" );
+            self add_option( "m1a1_turret", "^:Set Projectile: ^1rpg", ::set_projectile, "m1a1_turret" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+			self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "The Bog Projectiles":
+            self add_menu( menu );
+            self add_option( "javelin", "^:Set Projectile: ^1javelin", ::set_projectile, "javelin" );
+            self add_option( "javelin_objective", "^:Set Projectile: ^1javelin_objective", ::set_projectile, "javelin_objective" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "rpg_straight", "^:Set Projectile: ^1rpg_straight", ::set_projectile, "rpg_straight" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Hunted Projectiles":
+            self add_menu( menu );
+            self add_option( "hunted_crash_missile_hunted", "^:Set Projectile: ^1hunted_crash_missile_hunted", ::set_projectile, "hunted_crash_missile_hunted" );
+            self add_option( "m1014", "^:Set Projectile: ^1m1014", ::set_projectile, "m1014" );
+            self add_option( "m203_m4", "^:Set Projectile: ^1m203_m4", ::set_projectile, "m203_m4" );
+            self add_option( "stinger", "^:Set Projectile: ^1stinger", ::set_projectile, "stinger" );
+            self add_option( "t72_turret", "^:Set Projectile: ^1t72_turret", ::set_projectile, "t72_turret" );
+            self add_option( "t72_turret2", "^:Set Projectile: ^1t72_turret2", ::set_projectile, "t72_turret2" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Death From Above Projectiles":
+            self add_menu( menu );
+			self add_option( "AC130 25mm", "^:Set Projectile: ^1AC130 25mm", ::set_projectile, "ac130_25mm" );
+            self add_option( "AC130 40mm", "^:Set Projectile: ^1AC130 40mm", ::set_projectile, "ac130_40mm" );
+            self add_option( "AC130 105mm", "^:Set Projectile: ^1AC130 105mm", ::set_projectile, "ac130_105mm" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "War Pig Projectiles":
+            self add_menu( menu );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "remote_missile", "^:Set Projectile: ^1remote_missile", ::set_projectile, "remote_missile" );
+            self add_option( "t72_turret", "^:Set Projectile: ^1t72_turret", ::set_projectile, "t72_turret" );
+            self add_option( "t72_turret2", "^:Set Projectile: ^1t72_turret2", ::set_projectile, "t72_turret2" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Shock And Awe Projectiles":
+            self add_menu( menu );
+			self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "cobra_20mm", "^:Set Projectile: ^1cobra_20mm", ::set_projectile, "cobra_20mm" );
+            self add_option( "m1014", "^:Set Projectile: ^1m1014", ::set_projectile, "m1014" );
+            self add_option( "m1a1_coaxial_mg", "^:Set Projectile: ^1m1a1_coaxial_mg", ::set_projectile, "m1a1_coaxial_mg" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "t72_turret", "^:Set Projectile: ^1t72_turret", ::set_projectile, "t72_turret" );
+            self add_option( "t72_turret2", "^:Set Projectile: ^1t72_turret2", ::set_projectile, "t72_turret2" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "zpu_turret", "^:Set Projectile: ^1zpu_turret", ::set_projectile, "zpu_turret" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Aftermath Projectiles":
+            self add_menu( menu );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+			self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Safehouse Projectiles":
+            self add_menu( menu );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "cobra_air_support", "^:Set Projectile: ^1cobra_air_support", ::set_projectile, "cobra_air_support" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+            self add_option( "javelin", "^:Set Projectile: ^1javelin", ::set_projectile, "javelin" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "mi28_ffar_village_assault", "^:Set Projectile: ^1mi28_ffar_village_assault", ::set_projectile, "mi28_ffar_village_assault" );
+            self add_option( "minigun_player_turret", "^:Set Projectile: ^1minigun_player_turret", ::set_projectile, "minigun_player_turret" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "All Ghillied Up Projectiles":
+            self add_menu( menu );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "hind_ffar", "^:Set Projectile: ^1hind_ffar", ::set_projectile, "hind_ffar" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+            self add_option( "stinger", "^:Set Projectile: ^1stinger", ::set_projectile, "stinger" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "One Shot One Kill Projectiles":
+            self add_menu( menu );
+            self add_option( "barrett_fake", "^:Set Projectile: ^1barrett_fake", ::set_projectile, "barrett_fake" );
+            self add_option( "cobra_seeker", "^:Set Projectile: ^1cobra_seeker", ::set_projectile, "cobra_seeker" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+            self add_option( "hind_turret_penetration", "^:Set Projectile: ^1hind_turret_penetration", ::set_projectile, "hind_turret_penetration" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Heat Projectiles":
+            self add_menu( menu );
+            self add_option( "airstrike_support", "^:Set Projectile: ^1airstrike_support", ::set_projectile, "airstrike_support" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "javelin", "^:Set Projectile: ^1javelin", ::set_projectile, "javelin" );
+            self add_option( "m203_m4", "^:Set Projectile: ^1m203_m4", ::set_projectile, "m203_m4" );
+            self add_option( "minigun_player_turret", "^:Set Projectile: ^1minigun_player_turret", ::set_projectile, "minigun_player_turret" );
+            self add_option( "t72_turret", "^:Set Projectile: ^1t72_turret", ::set_projectile, "t72_turret" );
+            self add_option( "t72_turret2", "^:Set Projectile: ^1t72_turret2", ::set_projectile, "t72_turret2" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "The Sins Of The Father Projectiles":
+            self add_menu( menu );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "heli_minigun_noai", "^:Set Projectile: ^1heli_minigun_noai", ::set_projectile, "heli_minigun_noai" );
+            self add_option( "remington700", "^:Set Projectile: ^1remington700", ::set_projectile, "remington700" );
+			self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Ultimatum Projectiles":
+            self add_menu( menu );
+            self add_option( "m1014", "^:Set Projectile: ^1m1014", ::set_projectile, "m1014" );
+            self add_option( "m203_m4_silencer", "^:Set Projectile: ^1m203_m4_silencer", ::set_projectile, "m203_m4_silencer" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "All In Projectiles":
+            self add_menu( menu );
+            self add_option( "bm21_missile", "^:Set Projectile: ^1bm21_missile", ::set_projectile, "bm21_missile" );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "hind_ffar", "^:Set Projectile: ^1hind_ffar", ::set_projectile, "hind_ffar" );
+            self add_option( "hind_ffar_nodamage", "^:Set Projectile: ^1hind_ffar_nodamage", ::set_projectile, "hind_ffar_nodamage" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+            self add_option( "javelin", "^:Set Projectile: ^1javelin", ::set_projectile, "javelin" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "rpg_straight", "^:Set Projectile: ^1rpg_straight", ::set_projectile, "rpg_straight" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "No Fighting In The War Room Projectiles":
+            self add_menu( menu );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "javelin", "^:Set Projectile: ^1javelin", ::set_projectile, "javelin" );
+            self add_option( "m1014", "^:Set Projectile: ^1m1014", ::set_projectile, "m1014" );
+            self add_option( "m203", "^:Set Projectile: ^1m203", ::set_projectile, "m203" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Game Over Projectiles":
+            self add_menu( menu );
+            self add_option( "bmp_turret", "^:Set Projectile: ^1bmp_turret", ::set_projectile, "bmp_turret" );
+            self add_option( "bmp_turret2", "^:Set Projectile: ^1bmp_turret2", ::set_projectile, "bmp_turret2" );
+            self add_option( "crash_missile_jeepride", "^:Set Projectile: ^1crash_missile_jeepride", ::set_projectile, "crash_missile_jeepride" );
+            self add_option( "gp25", "^:Set Projectile: ^1gp25", ::set_projectile, "gp25" );
+            self add_option( "hind_ffar_jeepride", "^:Set Projectile: ^1hind_ffar_jeepride", ::set_projectile, "hind_ffar_jeepride" );
+            self add_option( "hind_turret", "^:Set Projectile: ^1hind_turret", ::set_projectile, "hind_turret" );
+            self add_option( "m203_m4", "^:Set Projectile: ^1m203_m4", ::set_projectile, "m203_m4" );
+            self add_option( "rpg_jeepride", "^:Set Projectile: ^1rpg_jeepride", ::set_projectile, "rpg_jeepride" );
+            self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Mile High Club Projectiles":
+            self add_menu( menu );
+            self add_option( "m1014", "^:Set Projectile: ^1m1014", ::set_projectile, "m1014" );
+            self add_option( "winchester1200", "^:Set Projectile: ^1winchester1200", ::set_projectile, "winchester1200" );
+			self add_option( "rpg", "^:Set Projectile: ^1rpg", ::set_projectile, "rpg" );
+            self add_option( "rpg_player", "^:Set Projectile: ^1rpg_player", ::set_projectile, "rpg_player" );
+            break;
+        case "Model Spawning":
+            self add_menu( menu );
+            self add_option( "Any", "^:Any Level Models", ::new_menu, "Any Models" );
+			self add_option( "FNG ^7(^1TODO^7)", "FNG Models", ::new_menu, "FNG Models" );
+            self add_option( "Crew Expendable ^7(^1TODO^7)", "Crew Expendable Models", ::new_menu, "Crew Expendable Models" );
+            self add_option( "The Coup ^7(^1TODO^7)", "The Coup Models", ::new_menu, "The Coup Models" );
+            self add_option( "Blackout ^7(^1TODO^7)", "Blackout Models", ::new_menu, "Blackout Models" );
+            self add_option( "Charlie Dont Surf ^7(^1TODO^7)", "Charlie Dont Surf Models", ::new_menu, "Charlie Dont Surf Models" );
+            self add_option( "The Bog ^7(^1TODO^7)", "The Bog Models", ::new_menu, "The Bog Models" );
+            self add_option( "Hunted ^7(^1TODO^7)", "Hunted Models", ::new_menu, "Hunted Models" );
+            self add_option( "Death From Above ^7(^1TODO^7)", "Death From Above Models", ::new_menu, "Death From Above Models" );
+            self add_option( "War Pig ^7(^1TODO^7)", "War Pig Models", ::new_menu, "War Pig Models" );
+            self add_option( "Shock And Awe ^7(^1TODO^7)", "Shock And Awe Models", ::new_menu, "Shock And Awe Models" );
+            self add_option( "Aftermath ^7(^1TODO^7)", "Aftermath Models", ::new_menu, "Aftermath Models" );
+            self add_option( "Safehouse ^7(^1TODO^7)", "Safehouse Models", ::new_menu, "Safehouse Models" );
+            self add_option( "All Ghillied Up ^7(^1TODO^7)", "All Ghillied Up Models", ::new_menu, "All Ghillied Up Models" );
+            self add_option( "One Shot One Kill ^7(^1TODO^7)", "One Shot One Kill Models", ::new_menu, "One Shot One Kill Models" );
+            self add_option( "Heat ^7(^1TODO^7)", "Heat Models", ::new_menu, "Heat Models" );
+            self add_option( "The Sins Of The Father ^7(^1TODO^7)", "The Sins Of The Father Models", ::new_menu, "The Sins Of The Father Models" );
+            self add_option( "Ultimatum ^7(^1TODO^7)", "Ultimatum Models", ::new_menu, "Ultimatum Models" );
+            self add_option( "All In ^7(^1TODO^7)", "All In Models", ::new_menu, "All In Models" );
+            self add_option( "No Fighting In The War Room ^7(^1TODO^7)", "No Fighting In The War Room Models", ::new_menu, "No Fighting In The War Room Models" );
+            self add_option( "Game Over ^7(^1TODO^7)", "Game Over Models", ::new_menu, "Game Over Models" );
+            self add_option( "Mile High Club ^7(^1TODO^7)", "Mile High Club Models", ::new_menu, "Mile High Club Models" );
+            break;
+        case "Any Models":
+            self add_menu( menu );
+            self add_option( "Spawn Model: body_zakhaev_viktor_collar", "Spawns Model For: ^1body_zakhaev_viktor_collar", ::spawn_model, "body_zakhaev_viktor_collar" );
+            self add_option( "Spawn Model: com_junktire ^:(^2Physics^:)", "Spawns Model For: ^1com_junktire", ::spawn_model_physics, "com_junktire" );
+            self add_option( "Spawn Model: defaultactor", "Spawns Model For: ^1defaultactor", ::spawn_model, "defaultactor" );
+            self add_option( "Spawn Model: defaultvehicle", "Spawns Model For: ^1defaultvehicle", ::spawn_model, "defaultvehicle" );
+            self add_option( "Spawn Model: defaultweapon", "Spawns Model For: ^1defaultweapon", ::spawn_model, "defaultweapon" );
+            self add_option( "Spawn Model: fx", "Spawns Model For: ^1fx", ::spawn_model, "fx" );
+            self add_option( "Spawn Model: grenade_bag", "Spawns Model For: ^1grenade_bag", ::spawn_model, "grenade_bag" );
+            self add_option( "Spawn Model: h1_food_fruit_lemon", "Spawns Model For: ^1h1_food_fruit_lemon", ::spawn_model, "h1_food_fruit_lemon" );
+            self add_option( "Spawn Model: head_zakhaev_viktor", "Spawns Model For: ^1head_zakhaev_viktor", ::spawn_model, "head_zakhaev_viktor" );
+            self add_option( "Spawn Model: helmet_sp_arab_regular_suren_nostrap ^:(^2Physics^:)", "Spawns Model For: ^1helmet_sp_arab_regular_suren_nostrap", ::spawn_model_physics, "helmet_sp_arab_regular_suren_nostrap" );
+            self add_option( "Spawn Model: helmet_sp_arab_regular_tariq_nostrap ^:(^2Physics^:)", "Spawns Model For: ^1helmet_sp_arab_regular_tariq_nostrap", ::spawn_model_physics, "helmet_sp_arab_regular_tariq_nostrap" );
+            self add_option( "Spawn Model: me_fruit_watermelon_oblong ^:(^2Physics^:)", "Spawns Model For: ^1me_fruit_watermelon_oblong", ::spawn_model_physics, "me_fruit_watermelon_oblong" );
+            self add_option( "Spawn Model: projectile_m67fraggrenade", "Spawns Model For: ^1projectile_m67fraggrenade", ::spawn_model, "projectile_m67fraggrenade" );
+            self add_option( "Spawn Model: projectile_m84_flashbang_grenade", "Spawns Model For: ^1projectile_m84_flashbang_grenade", ::spawn_model, "projectile_m84_flashbang_grenade" );
+            self add_option( "Spawn Model: projectile_rpg7 ^:(^2Physics^:)", "Spawns Model For: ^1projectile_rpg7", ::spawn_model_physics, "projectile_rpg7" );
+            self add_option( "Spawn Model: test_sphere_redchrome", "Spawns Model For: ^1test_sphere_redchrome", ::spawn_model, "test_sphere_redchrome" );
+            self add_option( "Spawn Model: test_sphere_silver", "Spawns Model For: ^1test_sphere_silver", ::spawn_model, "test_sphere_silver" );
+            self add_option( "Spawn Model: viewmodel_default", "Spawns Model For: ^1viewmodel_default", ::spawn_model, "viewmodel_default" );
+            self add_option( "Spawn Model: viewmodel_mp5", "Spawns Model For: ^1viewmodel_mp5", ::spawn_model, "viewmodel_mp5" );
+            self add_option( "Spawn Model: viewmodel_rpg7", "Spawns Model For: ^1viewmodel_rpg7", ::spawn_model, "viewmodel_rpg7" );
+            self add_option( "Spawn Model: weapon_m4_clip ^:(^2Physics^:)", "Spawns Model For: ^1weapon_m4_clip", ::spawn_model_physics, "weapon_m4_clip" );
+            self add_option( "Spawn Model: weapon_m67_grenade", "Spawns Model For: ^1weapon_m67_grenade", ::spawn_model, "weapon_m67_grenade" );
+            self add_option( "Spawn Model: weapon_m84_flashbang_grenade", "Spawns Model For: ^1weapon_m84_flashbang_grenade", ::spawn_model, "weapon_m84_flashbang_grenade" );
+            self add_option( "Spawn Model: weapon_mp5", "Spawns Model For: ^1weapon_mp5", ::spawn_model, "weapon_mp5" );
+            self add_option( "Spawn Model: weapon_parabolic_knife", "Spawns Model For: ^1weapon_parabolic_knife", ::spawn_model, "weapon_parabolic_knife" );
+            self add_option( "Spawn Model: weapon_rpg7", "Spawns Model For: ^1weapon_rpg7", ::spawn_model, "weapon_rpg7" );
+            break;
+        default:
+            if( !isdefined( self.selected_player ) )
+                self.selected_player = self;
+
+            self player_option( menu, self.selected_player );
+            break;
+    }
+}
+
+player_option( menu, player ) {
+    if( !isdefined( menu ) || !isdefined( player ) || !isplayer( player ) )
+        menu = "Error";
+
+    switch( menu ) {
+        case "Player Option":
+            self add_menu( clean_name( player get_name() ) );
+            break;
+        case "Error":
+            self add_menu();
+            self add_option( "Oops, Something Went Wrong!", "Condition: Undefined" );
+            break;
+        default:
+            error = true;
+            if( error ) {
+                self add_menu( "Critical Error" );
+                self add_option( "Oops, Something Went Wrong!", "Condition: Menu Index" );
+            }
+            break;
+    }
+}
