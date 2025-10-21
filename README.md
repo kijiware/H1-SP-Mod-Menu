@@ -30,7 +30,9 @@ A single player campaign mod menu with over 100 options made for the Call of Dut
 
 ## Screenshots
 
-todo
+<p align="center">
+    <img src="https://i.imgur.com/7yfCKHO.png" height="700" width="500">
+</p>
 
 ## Known Issues
 
