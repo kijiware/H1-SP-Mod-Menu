@@ -28,12 +28,6 @@ A single player campaign mod menu with over 100 options made for the Call of Dut
 - Lethal / Equipment to scroll left or right
 - Activate / Melee to accept or go back
 
-## Screenshots
-
-<p align="center">
-    <img src="https://i.imgur.com/7yfCKHO.png" height="700" width="500">
-</p>
-
 ## Known Issues
 
 - The menu may crash after viewing too many options (overflow)
@@ -42,3 +36,11 @@ A single player campaign mod menu with over 100 options made for the Call of Dut
 ## Credits
 
 - [Xeirh](https://github.com/Xeirh/) - M203 Menu Base
+
+## Screenshots
+
+<p align="center">
+    <img src="https://i.imgur.com/7yfCKHO.png" height="500" width="750>
+</p>
+
+##  
